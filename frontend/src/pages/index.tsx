@@ -1,5 +1,5 @@
 import UserInterface  from '@/components/UserInterface';
-//import Globe from '@/components/Globe';
+import Globe from '@/components/Globe';
 
 
 export default function index() {
@@ -8,9 +8,9 @@ export default function index() {
       <h3 className="text-lg font-semibold text-white text-center">Interactive Globe</h3>
       <div
         className="overflow-auto max-h-96 border rounded-md"
-        style={{ width: '100%', height: '300px' }}
-      >
-        {/* <Globe /> */}
+        style={{ width: '100%', height: '300px' }}>
+        <Globe />
+        <h1>GLOBE</h1>
         
       </div>
       <UserInterface backendName="go"/>

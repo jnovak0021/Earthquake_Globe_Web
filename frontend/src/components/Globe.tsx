@@ -1,9 +1,8 @@
-/*
 import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 
 const Globe: React.FC = () => {
-  const globeRef = useRef(null);
+  const globeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!globeRef.current) return;
@@ -72,4 +71,3 @@ const Globe: React.FC = () => {
 };
 
 export default Globe;
-*/

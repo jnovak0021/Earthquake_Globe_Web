@@ -1,11 +1,15 @@
 // import UserInterface  from '@/components/UserInterface';
 // import Globe from '@/components/Globe';
+import  Globe  from '@/components/Globe';
 import EarthQuakeFilter from '@/components/EarthqaukeFilter';
 
 
 export default function index() {
   return (
     <div className="mb-6">
+      <div className = "mb-6 m4">
+        <Globe />
+      </div>
       <h3 className="text-lg font-semibold text-white text-center">Interactive Globe</h3>
       <div
         className="max-h-96 border rounded-md"

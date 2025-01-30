@@ -1,4 +1,16 @@
 services:
+   watchtower:
+      container_name: watchtower
+      image: containrrr/watchtower
+      command: --interval 30
+      volumes:
+         - /var/run/docker.sock:/var/run/docker.sock
+      environment:
+         - WATCHTOWER_CLEANUP=true
+         - WATCHTOWER_LABEL_ENABLE=true
+         - WATCHTOWER_LABEL_FILTER=watchtower
+      restart: always
+
    db:
       container_name: db
       image: mysql:latest
@@ -7,26 +19,26 @@ services:
          MYSQL_ROOT_PASSWORD: "root"
          MYSQL_DATABASE: "earthquake_db"
       ports:
-         - "3307:3306"
+         - "3306:3306"
       volumes:
          - mysql_data:/var/lib/mysql
 
    goapp:
       container_name: goapp
-      #image: goapp:1.0.0
       build:
          context: ./backend
          dockerfile: go.dockerfile
       environment:
-         #DATABASE_URL: mysql://root:root@db:3306/earthquake_db
          DATABASE_URL: root:root@tcp(db:3306)/earthquake_db
       ports:
          - "8080:8080"
       depends_on:
          - db
+      #volumes:
+      # - ./backend:/app
+
    nextapp:
       container_name: nextapp
-      image: nextapp:1.0.0
       build:
          context: ./frontend
          dockerfile: next.dockerfile
@@ -36,6 +48,8 @@ services:
          - NEXT_PUBLIC_API_URL=http://localhost:8080
       depends_on:
          - goapp
+      #volumes:
+      # - ./frontend:/app
 
 volumes:
    pgdata: {}

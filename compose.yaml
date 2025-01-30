@@ -2,7 +2,7 @@ services:
    watchtower:
       container_name: watchtower
       image: containrrr/watchtower
-      command: --interval 30
+      command: --interval 5
       volumes:
          - /var/run/docker.sock:/var/run/docker.sock
       environment:
@@ -10,7 +10,6 @@ services:
          - WATCHTOWER_LABEL_ENABLE=true
          - WATCHTOWER_LABEL_FILTER=watchtower
       restart: always
-
    db:
       container_name: db
       image: mysql:latest

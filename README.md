@@ -7,6 +7,15 @@ This project was developed using docker to containerize a mysql database, a gola
 
 The goal of creating this full stack web-application was to allow users to view earthquake data across the globe by interacting with a globe.
 
+### Installation
+----
+Before running this program, please ensure that you have installed:
+- Docker Desktop
+- Node/npm
+- next js
+
+Please run the commands within your front end:
+
 ### How to Run
 ----
 To Run this application clone the repository.
@@ -20,7 +29,7 @@ To Run this application clone the repository.
 **This option is old but I am leaving just in case -- If nodemon works, just use that**
 Once the repository is stored locally on your machine:
 1. Navigate to the root directory of the project
-2. run the command **docker-compose up --build -d**
+2. run the command ** docker-compose up --build -d **
 
 This will containerize the full stack and will allow you to run the program.
 

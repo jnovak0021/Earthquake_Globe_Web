@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function Login() {
+export default function Login({ setIsLoggedIn }: { setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>> }) {
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [name, setName] = useState(""); // Added name state
@@ -24,7 +24,7 @@ export default function Login() {
          const data = await response.json();
          if (response.ok) {
             console.log("Login successful:", data);
-            // Redirect or show success message
+            setIsLoggedIn(true); // Set the login status to true
          } else {
             setErrorMessage(data.message || "Login failed");
          }

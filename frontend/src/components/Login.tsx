@@ -61,41 +61,50 @@ export default function Login({ setIsLoggedIn }: { setIsLoggedIn: React.Dispatch
    };
 
    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900">
-         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-center text-gray-800">{isCreatingAccount ? "Create Account" : "Login"}</h2>
-
+      <div className="flex items-center justify-center min-h-screen bg-blue-900">
+         {" "}
+         {/* Fullscreen Dark Blue Background */}
+         <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 text-white rounded-lg shadow-lg">
+            {" "}
+            {/* Dark login box */}
+            <h2 className="text-2xl font-bold text-center">{isCreatingAccount ? "Create Account" : "Login"}</h2>
             {accountCreated ? (
                <div className="space-y-4">
-                  <p className="text-center text-lg font-bold text-blue-600">Account created successfully!</p>
+                  <p className="text-center text-lg font-bold text-green-400">Account created successfully!</p>
                   <a
                      href="#"
                      onClick={() => {
                         setIsCreatingAccount(false);
                         setAccountCreated(false);
                      }}
-                     className="block text-center text-sm text-blue-600 hover:underline"
+                     className="block text-center text-sm text-blue-400 hover:underline"
                   >
                      Back to Login
                   </a>
                </div>
             ) : (
                <form onSubmit={isCreatingAccount ? handleCreateAccount : handleLogin} className="space-y-4">
-                  {isCreatingAccount && <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />}
+                  {isCreatingAccount && (
+                     <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full p-3 border border-gray-600 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  )}
 
-                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 border border-gray-600 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
-                  <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input
+                     type="password"
+                     placeholder="Password"
+                     value={password}
+                     onChange={(e) => setPassword(e.target.value)}
+                     className="w-full p-3 border border-gray-600 rounded bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
 
                   <button type="submit" className="w-full p-3 font-semibold text-white bg-blue-600 rounded hover:bg-blue-700">
                      {isCreatingAccount ? "Create Account" : "Sign In"}
                   </button>
                </form>
             )}
-
             {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
-
-            <div className="flex justify-between text-sm text-gray-600">
+            <div className="flex justify-between text-sm text-gray-400">
                <a href="#" className="hover:underline">
                   Forgot Password?
                </a>

@@ -4,20 +4,27 @@ import Login from "@/components/Login";
 import { useState } from "react";
 
 export default function Index() {
-   const [isLoggedIn, setIsLoggedIn] = useState(false); // Now we can update this state
+   const [isLoggedIn, setIsLoggedIn] = useState(false); // State to manage login status
 
    return (
-      <div>
+      <div className="min-h-screen w-full bg-blue-900 flex justify-center items-center">
          {!isLoggedIn ? (
-            <Login setIsLoggedIn={setIsLoggedIn} /> /* Pass the setIsLoggedIn function */
+            <Login setIsLoggedIn={setIsLoggedIn} />
          ) : (
-            <div className="mb-6">
-               <h3 className="text-lg font-semibold text-white text-center">Interactive Globe</h3>
-               <div className="overflow-auto max-h-96 border rounded-md" style={{ width: "100%", height: "300px" }}>
-                  <Globe />
-                  <h1>GLOBE</h1>
+            // After Login - Globe & Earthquake Filter layout
+            <div className="flex w-full h-full">
+               {/* Globe Section */}
+               <div className="flex-grow relative">
+                  <h3 className="text-lg font-semibold text-white text-center absolute top-5 left-0 right-0">Interactive Globe</h3>
+                  <div className="overflow-auto w-full h-full">
+                     <Globe />
+                  </div>
                </div>
-               <EarthquakeFilter />
+
+               {/* Earthquake Filter Tab */}
+               <div className="w-80 bg-gray-200 p-4 rounded-lg shadow-md flex-shrink-0">
+                  <EarthquakeFilter />
+               </div>
             </div>
          )}
       </div>

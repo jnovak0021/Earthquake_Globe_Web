@@ -8,7 +8,8 @@ export default function Index() {
 
    return (
       <div className="min-h-screen w-full bg-blue-900 flex justify-center items-center">
-         {!isLoggedIn ? (
+         <Globe />
+         {/* {!isLoggedIn ? (
             <Login setIsLoggedIn={setIsLoggedIn} />
          ) : (
             // After Login - Globe & Earthquake Filter layout
@@ -21,12 +22,12 @@ export default function Index() {
                   </div>
                </div>
 
-               {/* Earthquake Filter Tab */}
+               {/* Earthquake Filter Tab 
                <div className="w-80 bg-gray-200 p-4 rounded-lg shadow-md flex-shrink-0">
                   <EarthquakeFilter />
                </div>
             </div>
-         )}
+         )} */}
       </div>
    );
 }

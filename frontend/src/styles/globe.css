@@ -1,37 +1,33 @@
-#root {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-  }
-  
-  #map-container {
-    height: 100%;
-    width: 100%;
-    /* temporarily set the background color so we can tell where the map container is positioned */
-    background-color: lightgrey;
-  }
-  
-  .sidebar {
-    background-color: rgb(35 55 75 / 90%);
-    color: #fff;
-    padding: 6px 12px;
-    font-family: monospace;
-    z-index: 1;
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 12px;
-    border-radius: 4px;
-  }
-  
-  .reset-button {
-    position: absolute;
-    top: 50px;
-    z-index: 1;
-    left: 12px;
-    padding: 4px 10px;
-    border-radius: 10px;
-    cursor: pointer;
-  }
+/* Globe scaling and transition when logged in */
+.globe-transition {
+   transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+   transform: scale(0.6);
+   opacity: 0.5;
+}
+
+/* When logged in, enlarge and center the globe */
+.globe-centered {
+   transform: scale(1.8);
+   opacity: 1;
+   transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+}
+
+/* You can also use `scale-150` or other scale utilities in Tailwind to adjust the scale directly */
+.scale-150 {
+   transform: scale(1.5);
+}
+
+/* If you want to animate opacity as well when logged in */
+.fade-in {
+   opacity: 0;
+   animation: fadeIn 1s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+   from {
+      opacity: 0;
+   }
+   to {
+      opacity: 1;
+   }
+}

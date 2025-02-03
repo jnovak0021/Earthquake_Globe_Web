@@ -3,19 +3,67 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+   --background: #ffffff;
+   --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+   :root {
+      --background: #0a0a0a;
+      --foreground: #ededed;
+   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+   color: var(--foreground);
+   background: var(--background);
+   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ----------- Globe Transition Animation ----------- */
+.globe-transition {
+   position: absolute;
+   top: 20px; /* Start small above login box */
+   left: 50%;
+   transform: translateX(-50%) scale(0.5);
+   transition: all 1s ease-in-out;
+}
+
+.globe-centered {
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%) scale(1.5); /* Moves to center and enlarges */
+}
+
+/* ----------- Earthquake Filter Fade-in ----------- */
+@keyframes fadeIn {
+   from {
+      opacity: 0;
+   }
+   to {
+      opacity: 1;
+   }
+}
+
+.fade-in {
+   opacity: 0;
+   animation: fadeIn 1s ease-in-out forwards;
+   animation-delay: 1s; /* Delays so it appears after the globe moves */
+}
+
+#map-container {
+   background: transparent !important; /* Ensure no background */
+   position: absolute;
+   width: 100vw;
+   height: 100vh;
+   top: 0;
+   left: 0;
+   overflow: auto; /* Allow scrolling */
+   pointer-events: auto; /* Ensure the globe is interactive */
+   cursor: grab; /* Show the grab cursor to indicate dragging */
+}
+
+/* Optional: add a rule for dragging */
+#map-container:active {
+   cursor: grabbing; /* Change cursor when the globe is dragged */
 }

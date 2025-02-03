@@ -8,24 +8,38 @@ const Globe: React.FC = () => {
 
    useEffect(() => {
       if (mapContainerRef.current) {
-         mapboxgl.accessToken = "pk.eyJ1Ijoiam5vdmFrMDAyMSIsImEiOiJjbTZqanh1YzUwMW9rMnFwdDhnM2xsdW9tIn0.5T_he6q9jDjNzp1lZy4e6Q"; // Replace with your Mapbox access token
+         mapboxgl.accessToken = "pk.eyJ1Ijoiam5vdmFrMDAyMSIsImEiOiJjbTZqanh1YzUwMW9rMnFwdDhnM2xsdW9tIn0.5T_he6q9jDjNzp1lZy4e6Q";
          mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: "mapbox://styles/mapbox/standard",
-            //style: 'mapbox://styles/mapbox/standard-satellite', // Replace with your desired map style
-            center: [-122.420679, 37.772537], // Initial map center [lng, lat]
-            zoom: 13, // Initial map zoom level
+            center: [0, 0],
+            zoom: 2,
+            projection: "globe", // Ensures spherical view
+            antialias: true, // Improves rendering quality
+         });
+
+         // Make background completely transparent
+         mapRef.current.on("style.load", () => {
+            mapRef.current?.setPaintProperty("background", "background-color", "rgba(0, 0, 0, 0)");
          });
 
          return () => {
-            if (mapRef.current) {
-               mapRef.current.remove();
-            }
+            mapRef.current?.remove();
          };
       }
    }, []);
 
-   return <div id="map-container" ref={mapContainerRef} style={{ width: "100%", height: "100vh" }} />;
+   return (
+      <div
+         id="map-container"
+         ref={mapContainerRef}
+         className="absolute top-0 left-0 w-full h-full"
+         style={{
+            background: "transparent",
+            pointerEvents: "auto", // Ensure interactions work properly
+         }}
+      />
+   );
 };
 
 export default Globe;

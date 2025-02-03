@@ -29,7 +29,7 @@ const EarthQuakeFilter: React.FC = () => {
    };
 
    const fetchAllData = async (): Promise<Earthquake[]> => {
-      const limit = 50; // Adjust the limit as needed
+      const limit = 50;
       let offset = 1;
       let allData: Earthquake[] = [];
       let hasMoreData = true;
@@ -37,7 +37,6 @@ const EarthQuakeFilter: React.FC = () => {
       while (hasMoreData) {
          const promises = [];
          for (let i = 0; i < 100; i++) {
-            // Adjust the number of concurrent requests as needed
             promises.push(fetchPageData(offset + i * limit, limit));
          }
 
@@ -70,21 +69,39 @@ const EarthQuakeFilter: React.FC = () => {
 
    return (
       <div className="bg-gray-200 p-4 rounded-lg shadow-md">
-         <h1 className="text-xl font-bold mb-4 text-black">EarthQuakeFilter</h1>
+         {/* Time Range Section */}
          <div className="mb-2">
+            <h2 className="text-lg font-semibold text-black mb-2">Time Range</h2>
             <input type="text" placeholder="Start Time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
             <input type="text" placeholder="End Time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
+         </div>
+
+         {/* Magnitude Range Section */}
+         <div className="mb-2">
+            <h2 className="text-lg font-semibold text-black mb-2">Magnitude Range</h2>
             <input type="text" placeholder="Min Magnitude" value={minMagnitude} onChange={(e) => setMinMagnitude(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
             <input type="text" placeholder="Max Magnitude" value={maxMagnitude} onChange={(e) => setMaxMagnitude(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
+         </div>
+
+         {/* Depth Range Section */}
+         <div className="mb-2">
+            <h2 className="text-lg font-semibold text-black mb-2">Depth Range</h2>
             <input type="text" placeholder="Min Depth" value={minDepth} onChange={(e) => setMinDepth(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
             <input type="text" placeholder="Max Depth" value={maxDepth} onChange={(e) => setMaxDepth(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
+         </div>
+
+         {/* KML Color By Section */}
+         <div className="mb-2">
+            <h2 className="text-lg font-semibold text-black mb-2">KML Color By</h2>
             <input type="text" placeholder="KML Color By" value={kmlColorBy} onChange={(e) => setKmlColorBy(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
          </div>
+
          <button onClick={handleApiCall} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600" disabled={loading}>
             {loading ? "Loading..." : "Get Data"}
          </button>
+
          <div className="mt-4">
-            <h1 className="text-black">Total EarthQuakes: {earthquakes.length}</h1>
+            <h1 className="text-black">Total Earthquakes: {earthquakes.length}</h1>
             {earthquakes.map((earthquake, index) => (
                <div key={index} className="p-2 text-black border-b border-gray-300">
                   {earthquake.properties.place} - Magnitude: {earthquake.properties.mag}

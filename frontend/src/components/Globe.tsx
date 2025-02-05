@@ -2,73 +2,96 @@ import React, { useRef, useEffect } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const Globe: React.FC = () => {
+interface GlobeProps {
+   earthquakes: Array<{
+      geometry?: {
+         coordinates: number[];
+      };
+      properties: {
+         place: string;
+         mag: number;
+         depth?: number;
+      };
+   }>;
+}
+
+const Globe: React.FC<GlobeProps> = ({ earthquakes }) => {
    const mapContainerRef = useRef<HTMLDivElement>(null);
    const mapRef = useRef<mapboxgl.Map | null>(null);
+
+   // Function to get color based on depth
+   const getDepthColor = (depth: number) => {
+      const depthX = Math.min(Math.max(depth / 1000, 0), 1);
+      const red = 255;
+      const green = Math.floor(255 * (1 - depthX));
+      const blue = 0;
+      return `rgba(${red}, ${green}, ${blue}, 0.6)`;
+   };
 
    useEffect(() => {
       if (mapContainerRef.current) {
          mapboxgl.accessToken = "pk.eyJ1Ijoiam5vdmFrMDAyMSIsImEiOiJjbTZqanh1YzUwMW9rMnFwdDhnM2xsdW9tIn0.5T_he6q9jDjNzp1lZy4e6Q";
          mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
-            style: "mapbox://styles/mapbox/standard",
+            style: "mapbox://styles/mapbox/satellite-streets-v12",
             center: [0, 0],
             zoom: 2,
-            projection: "globe", // Ensures spherical view
-            antialias: true, // Improves rendering quality
+            projection: "globe",
+            antialias: true,
          });
 
-         // Make background completely transparent
+         // Make background transparent
          mapRef.current.on("style.load", () => {
             mapRef.current?.setPaintProperty("background", "background-color", "rgba(0, 0, 0, 0)");
          });
 
-      
-      mapRef.current.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
 
-      /*
+         // Add navigation controls
+         mapRef.current.addControl(new mapboxgl.NavigationControl());
 
-    for (const marker of geojson.features) {
-      const el = document.createElement('div');
-      const width = marker.properties.iconSize[0];
-      const height = marker.properties.iconSize[1];
-      el.className = 'marker';
-      el.style.backgroundImage = `url(https://picsum.photos/id/${marker.properties.imageId}/${width}/${height})`;
-      el.style.width = `${width}px`;
-      el.style.height = `${height}px`;
-      el.style.backgroundSize = '100%';
-      el.style.display = 'block';
-      el.style.border = 'none';
-      el.style.borderRadius = '50%';
-      el.style.cursor = 'pointer';
-      el.style.padding = 0;
+         return () => {
+            mapRef.current?.remove();
+         };
+      }
+   }, []);
 
-      el.addEventListener('click', () => {
-        window.alert(marker.properties.message);
-      });
+   // Update markers when earthquakes data changes
+   useEffect(() => {
+      if (mapRef.current && earthquakes.length > 0) {
+         // Remove existing markers
+         const markers = document.getElementsByClassName("marker");
+         while (markers[0]) {
+            markers[0].remove();
+         }
 
-      new mapboxgl.Marker(el)
-        .setLngLat(marker.geometry.coordinates)
-        .addTo(mapRef.current);
-    }
-      */ 
+         // Add new markers
+         earthquakes.forEach((earthquake) => {
+            console.log(earthquake);
+            if (earthquake.geometry?.coordinates) {
+               const [lng, lat, depth = 0] = earthquake.geometry.coordinates;
 
+               const el = document.createElement("div");
+               const size = Math.min(50, Math.log10(earthquake.properties.mag) * 25);
+               el.className = "marker";
+               el.style.width = `${size}px`;
+               el.style.height = `${size}px`;
+               el.style.backgroundColor = getDepthColor(depth);
+               el.style.borderRadius = "50%";
+               el.style.border = "2px solid white";
 
+               const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
+                  `<strong>${earthquake.properties.place}</strong><br>
+            Magnitude: ${earthquake.properties.mag}<br>
+            Depth: ${depth.toFixed(2)} km`
+               );
 
-      //https://docs.mapbox.com/mapbox-gl-js/api/markers/
-      // Create a new marker.
-      /*
-      const marker = new mapboxgl.Marker()
-         .setLngLat([30.5, 50.5])
-         .addTo(mapRef.current);
-      */
-      return () => {
-        if (mapRef.current) {
-          mapRef.current.remove();
-        }
-      };
-    }
-  }, []);
+               if (mapRef.current) {
+                  new mapboxgl.Marker(el).setLngLat([lng, lat]).setPopup(popup).addTo(mapRef.current);
+               }
+            }
+         });
+      }
+   }, [earthquakes]);
 
    return (
       <div
@@ -77,7 +100,7 @@ const Globe: React.FC = () => {
          className="absolute top-0 left-0 w-full h-full"
          style={{
             background: "transparent",
-            pointerEvents: "auto", // Ensure interactions work properly
+            pointerEvents: "auto",
          }}
       />
    );

@@ -1,7 +1,22 @@
 import { useState } from "react";
-import EarthQuakeFilter from "./EarthqaukeFilter";
+import EarthquakeFilter from "./EarthqaukeFilter";
 
-const EarthquakeFilterDropdown: React.FC = () => {
+interface Earthquake {
+   properties: {
+      place: string;
+      mag: number;
+      depth?: number;
+   };
+   geometry?: {
+      coordinates: number[];
+   };
+}
+
+interface EarthquakeFilterDropdownProps {
+   onEarthquakesUpdate: (earthquakes: Earthquake[]) => void;
+}
+
+const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onEarthquakesUpdate }) => {
    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
    return (
@@ -15,7 +30,7 @@ const EarthquakeFilterDropdown: React.FC = () => {
          {isDropdownOpen && (
             <div className="absolute top-20 right-12 w-80 bg-gray-800 bg-opacity-80 p-2 rounded-lg shadow-lg max-h-[700px] overflow-y-auto">
                <h1 className="text-xl font-bold text-white mb-4">Earthquake Filter</h1>
-               <EarthQuakeFilter />
+               <EarthquakeFilter onEarthquakesUpdate={onEarthquakesUpdate} />
             </div>
          )}
       </div>

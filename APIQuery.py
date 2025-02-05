@@ -14,8 +14,8 @@ def validDate(year, month):
     return year, month, f"{year}-{month:02d}-01"
 
 def queryAPI(year, month):
-    totalData = {}
-    while year < 2025:
+    totalData = []
+    while year <= 2025:
         current = f"{year}-{month:02d}-02"
         year, month, next = validDate(year, month)
         params = {
@@ -27,7 +27,7 @@ def queryAPI(year, month):
         response = requests.get(base_url, params=params)
         if response.status_code == 200:
             data = response.json()
-            totalData[current] = data
+            totalData.extend(data['features'])
         else:
             print(f"Failed to retrieve data for {current}: {response.status_code}")
     return totalData

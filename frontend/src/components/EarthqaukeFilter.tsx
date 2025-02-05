@@ -4,10 +4,18 @@ interface Earthquake {
    properties: {
       place: string;
       mag: number;
+      depth?: number;
+   };
+   geometry?: {
+      coordinates: number[];
    };
 }
 
-const EarthQuakeFilter: React.FC = () => {
+interface EarthquakeFilterProps {
+   onEarthquakesUpdate: (earthquakes: Earthquake[]) => void;
+}
+
+const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate }) => {
    const [startTime, setStartTime] = useState("2020-01-01");
    const [endTime, setEndTime] = useState("2025-01-01");
    const [minMagnitude, setMinMagnitude] = useState("0");
@@ -36,7 +44,7 @@ const EarthQuakeFilter: React.FC = () => {
 
       while (hasMoreData) {
          const promises = [];
-         for (let i = 0; i < 100; i++) {
+         for (let i = 0; i < 10; i++) {
             promises.push(fetchPageData(offset + i * limit, limit));
          }
 
@@ -59,7 +67,7 @@ const EarthQuakeFilter: React.FC = () => {
       try {
          const allData = await fetchAllData();
          setEarthquakes(allData);
-         console.log(allData);
+         onEarthquakesUpdate(allData);
       } catch (error) {
          console.error(error);
       } finally {
@@ -69,28 +77,24 @@ const EarthQuakeFilter: React.FC = () => {
 
    return (
       <div className="bg-gray-200 p-4 rounded-lg shadow-md">
-         {/* Time Range Section */}
          <div className="mb-2">
             <h2 className="text-lg font-semibold text-black mb-2">Time Range</h2>
             <input type="text" placeholder="Start Time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
             <input type="text" placeholder="End Time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
          </div>
 
-         {/* Magnitude Range Section */}
          <div className="mb-2">
             <h2 className="text-lg font-semibold text-black mb-2">Magnitude Range</h2>
             <input type="text" placeholder="Min Magnitude" value={minMagnitude} onChange={(e) => setMinMagnitude(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
             <input type="text" placeholder="Max Magnitude" value={maxMagnitude} onChange={(e) => setMaxMagnitude(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
          </div>
 
-         {/* Depth Range Section */}
          <div className="mb-2">
             <h2 className="text-lg font-semibold text-black mb-2">Depth Range</h2>
             <input type="text" placeholder="Min Depth" value={minDepth} onChange={(e) => setMinDepth(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
             <input type="text" placeholder="Max Depth" value={maxDepth} onChange={(e) => setMaxDepth(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
          </div>
 
-         {/* KML Color By Section */}
          <div className="mb-2">
             <h2 className="text-lg font-semibold text-black mb-2">KML Color By</h2>
             <input type="text" placeholder="KML Color By" value={kmlColorBy} onChange={(e) => setKmlColorBy(e.target.value)} className="w-full p-2 mb-2 border border-gray-300 rounded text-black" />
@@ -102,14 +106,9 @@ const EarthQuakeFilter: React.FC = () => {
 
          <div className="mt-4">
             <h1 className="text-black">Total Earthquakes: {earthquakes.length}</h1>
-            {earthquakes.map((earthquake, index) => (
-               <div key={index} className="p-2 text-black border-b border-gray-300">
-                  {earthquake.properties.place} - Magnitude: {earthquake.properties.mag}
-               </div>
-            ))}
          </div>
       </div>
    );
 };
 
-export default EarthQuakeFilter;
+export default EarthquakeFilter;

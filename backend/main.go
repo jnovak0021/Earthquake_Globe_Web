@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,9 +14,9 @@ import (
 )
 
 type User struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Password string `json:"password,omitempty"`
 }
 
@@ -25,7 +26,7 @@ func connectWithRetry(dsn string) *sql.DB {
 
 	for retries := 5; retries > 0; retries-- {
 		db, err = sql.Open("mysql", dsn)
-		if err == nil && db.Ping() == nil {
+		if err == nil {
 			return db
 		}
 		log.Printf("Retrying connection to the database. Retries left: %d", retries-1)
@@ -42,10 +43,21 @@ func main() {
 	log.Println("Database")
 	//connect to database
 	// Define your DSN (Data Source Name)
-	dsn := "root:root@tcp(db:3306)/earthquake_db"
+	password := "#5%*HG6kSnOKA^3y"
+	encodedPassword := url.QueryEscape(password)
+	log.Println("Encoded Password:", encodedPassword)
 
+	dsn := "admin:%235%25%2AHG6kSnOKA%5E3y@tcp(3.142.177.103:3306)/earthquake_db?tls=skip-verify&parseTime=true"
 	// Call the connectWithRetry function
-	db := connectWithRetry(dsn)
+	var db *sql.DB
+	var err2 error
+	db, err2 = sql.Open("mysql", dsn)
+	if err2 == nil {
+		log.Println("Successfully connected to Database")
+	} else {
+		log.Fatalf("Failed to connect to the database: %v", err2)
+	}
+	//db := connectWithRetry(dsn)
 	defer db.Close()
 
 	/*db, err := sql.Open("mysql", os.Getenv("DATABASE_URL"))
@@ -56,10 +68,10 @@ func main() {
 	*/
 	//defer db.Close()
 
-	log.Println("Successfully connected to Database")
+	//log.Println("Successfully connected to Database")
 
 	// create table if not exists
-	//declaring err 
+	//declaring err
 	var err error
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
@@ -71,17 +83,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error creating table: %v", err)
 	}
+	log.Println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ")
 
 	// User routes
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")     // Get all users
-	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")   // Create a new user (signup)
-	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")    // User login
-	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")  // Get user by ID
-	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT") // Update user
+	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")           // Get all users
+	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")        // Create a new user (signup)
+	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")         // User login
+	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")       // Get user by ID
+	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")    // Update user
 	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE") // Delete user
-
 
 	// wrap the router with CORS and JSON content type middlewares
 	enhancedRouter := enableCORS(jsonContentTypeMiddleware(router))
@@ -293,4 +305,3 @@ func loginUser(db *sql.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(storedUser)
 	}
 }
-

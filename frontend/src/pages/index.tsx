@@ -1,10 +1,10 @@
 import Globe from "@/components/Globe";
 import EarthquakeFilterDropdown from "@/components/EarthquakeFilterDropdown"; // Import dropdown component
-import Login from "@/components/Login";
-import { useState } from "react";
+//import Login from "@/components/Login";
+//import { useState } from "react";
 
 export default function Index() {
-   const [isLoggedIn, setIsLoggedIn] = useState(false);
+   //const [isLoggedIn, setIsLoggedIn] = useState(false);
 
    return (
 
@@ -15,12 +15,12 @@ export default function Index() {
          </div>
 
          {/* Login or Earthquake Filter Section */}
-         {!isLoggedIn ? (
+         {/* {!isLoggedIn ? ( */}
             <div className="flex justify-center items-center z-10 w-full h-full">
-               <Login setIsLoggedIn={setIsLoggedIn} setUser={() => {}} />
+               {/* <Login setIsLoggedIn={setIsLoggedIn} setUser={() => {}} /> */}
             </div>
 
-         ) : (
+         {/* ) : ( */}
             <div className="flex w-full h-screen z-10">
                {/* Globe Section */}
                <div className="flex-grow relative flex items-center justify-center">
@@ -36,7 +36,7 @@ export default function Index() {
                   <EarthquakeFilterDropdown />
                </div>
             </div>
-         )} 
+         {/* )}  */}
       </div>
    );
 }

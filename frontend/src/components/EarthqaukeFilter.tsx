@@ -18,8 +18,10 @@ const EarthQuakeFilter: React.FC = () => {
    const [earthquakes, setEarthquakes] = useState<Earthquake[]>([]);
    const [loading, setLoading] = useState(false);
 
+   
    const fetchPageData = async (offset: number, limit: number): Promise<Earthquake[]> => {
       const response = await fetch(
+         //'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson'
          `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=${startTime}&endtime=${endTime}&minmagnitude=${minMagnitude}&maxmagnitude=${maxMagnitude}&mindepth=${minDepth}&maxdepth=${maxDepth}&offset=${offset}&limit=${limit}`
       );
       if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);

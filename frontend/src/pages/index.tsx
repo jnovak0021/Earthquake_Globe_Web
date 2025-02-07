@@ -4,16 +4,15 @@ import EarthquakeFilterDropdown from "@/components/EarthquakeFilterDropdown";
 import { useState } from "react";
 
 interface Earthquake {
-   properties: {
-      place: string;
-      mag: number;
-      depth?: number;
-   };
-   geometry?: {
-      coordinates: number[];
-   };
+   id: string;
+   time: string;
+   place: string;
+   latitude: number;
+   longitude: number;
+   depth: number;
+   mag: number;
+   status: string;
 }
-
 export default function Index() {
    //const [isLoggedIn, setIsLoggedIn] = useState(false);
    const [earthquakes, setEarthquakes] = useState<Earthquake[]>([]);

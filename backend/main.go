@@ -3,9 +3,9 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -20,13 +20,24 @@ type User struct {
 	Password string `json:"password,omitempty"`
 }
 
+type Earthquake struct {
+	Id        string  `json:"id"`
+	Time      string  `json:"time"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Depth     float64 `json:"depth"`
+	Mag       float64 `json:"mag"`
+	Place     string  `json:"place"`
+	Status    string  `json:"status"`
+}
+
 func connectWithRetry(dsn string) *sql.DB {
 	var db *sql.DB
 	var err error
 
 	for retries := 5; retries > 0; retries-- {
 		db, err = sql.Open("mysql", dsn)
-		if err == nil {
+		if err == nil && db.Ping() == nil {
 			return db
 		}
 		log.Printf("Retrying connection to the database. Retries left: %d", retries-1)
@@ -42,22 +53,19 @@ func main() {
 	log.Println("This is a log message with a newline.")
 	log.Println("Database")
 	//connect to database
-	// Define your DSN (Data Source Name)
-	password := "#5%*HG6kSnOKA^3y"
-	encodedPassword := url.QueryEscape(password)
-	log.Println("Encoded Password:", encodedPassword)
 
-	dsn := "admin:%235%25%2AHG6kSnOKA%5E3y@tcp(3.142.177.103:3306)/earthquake_db?tls=skip-verify&parseTime=true"
-	// Call the connectWithRetry function
-	var db *sql.DB
-	var err2 error
-	db, err2 = sql.Open("mysql", dsn)
-	if err2 == nil {
-		log.Println("Successfully connected to Database")
-	} else {
-		log.Fatalf("Failed to connect to the database: %v", err2)
+	//store password for user admin
+	// Define your DSN (Data Source Name)
+	dbConfig := map[string]string{
+		"host":     "earthquake.cn8yiso6kgjx.us-east-1.rds.amazonaws.com",
+		"user":     "admin",
+		"password": "EAhvGyr8Zn55b07I",
+		"database": "Earthquake",
 	}
-	//db := connectWithRetry(dsn)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s", dbConfig["user"], dbConfig["password"], dbConfig["host"], dbConfig["database"])
+
+	// Call the connectWithRetry function
+	db := connectWithRetry(dsn)
 	defer db.Close()
 
 	/*db, err := sql.Open("mysql", os.Getenv("DATABASE_URL"))
@@ -68,22 +76,21 @@ func main() {
 	*/
 	//defer db.Close()
 
-	//log.Println("Successfully connected to Database")
+	log.Println("Successfully connected to Database")
 
 	// create table if not exists
 	//declaring err
-	var err error
+	//var err error
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name TEXT,
-        email TEXT,
-		password TEXT NOT NULL
-    )`)
-	if err != nil {
-		log.Fatalf("Error creating table: %v", err)
-	}
-	log.Println("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ")
+	// _, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
+	//     id INT AUTO_INCREMENT PRIMARY KEY,
+	//     name TEXT,
+	//     email TEXT,
+	// 	password TEXT NOT NULL
+	// // )`)
+	// if err != nil {
+	// 	log.Fatalf("Error creating table: %v", err)
+	// }
 
 	// User routes
 	router := mux.NewRouter()
@@ -94,6 +101,9 @@ func main() {
 	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")       // Get user by ID
 	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")    // Update user
 	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE") // Delete user
+
+	//add router decleration for quering earthquake data
+	router.HandleFunc("/api/go/earthquakes", getEarthquakes(db)).Methods("GET") // Get all earthquakes
 
 	// wrap the router with CORS and JSON content type middlewares
 	enhancedRouter := enableCORS(jsonContentTypeMiddleware(router))
@@ -128,6 +138,42 @@ func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
+}
+
+// function to get earthquakes from aws
+func getEarthquakes(db *sql.DB) http.HandlerFunc {
+	log.Println("EARTHQUAKES")
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		rows, err := db.Query("SELECT id, time, latitude, longitude, depth, mag, place, status FROM Earthquakes;")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		earthquakes := []Earthquake{}
+		for rows.Next() {
+			var e Earthquake
+			if err := rows.Scan(&e.Id, &e.Time, &e.Latitude, &e.Longitude, &e.Depth, &e.Mag, &e.Place, &e.Status); err != nil {
+				log.Fatal(err)
+			}
+			earthquakes = append(earthquakes, e)
+		}
+		if err := rows.Err(); err != nil {
+			log.Fatal(err)
+		}
+
+		// Log the earthquakes
+		for _, e := range earthquakes {
+			log.Printf("Earthquake: %+v\n", e)
+		}
+
+		// Encode the earthquakes as JSON and write to the response
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(earthquakes); err != nil {
+			http.Error(w, "Failed to encode earthquakes as JSON", http.StatusInternalServerError)
+		}
+	}
 }
 
 // get all users

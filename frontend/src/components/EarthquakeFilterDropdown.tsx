@@ -2,16 +2,15 @@ import { useState } from "react";
 import EarthquakeFilter from "./EarthqaukeFilter";
 
 interface Earthquake {
-   properties: {
-      place: string;
-      mag: number;
-      depth?: number;
-   };
-   geometry?: {
-      coordinates: number[];
-   };
+   id: string;
+   time: string;
+   place: string;
+   latitude: number;
+   longitude: number;
+   depth: number;
+   mag: number;
+   status: string;
 }
-
 interface EarthquakeFilterDropdownProps {
    onEarthquakesUpdate: (earthquakes: Earthquake[]) => void;
 }

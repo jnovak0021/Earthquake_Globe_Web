@@ -29,6 +29,10 @@ interface EarthquakeFilterProps {
 
 const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate }) => {
    const [startTime, setStartTime] = useState("2020-01-01");
+   const [minLatitude, setMinLatitude] = useState("0");
+   const [maxLatitude, setMaxLatitude] = useState("90");
+   const [minLongitude, setMinLongitude] = useState("0");
+   const [maxLongitude, setMaxLongitude] = useState("180");
    const [endTime, setEndTime] = useState("2025-01-01");
    const [minMagnitude, setMinMagnitude] = useState("0");
    const [maxMagnitude, setMaxMagnitude] = useState("10");

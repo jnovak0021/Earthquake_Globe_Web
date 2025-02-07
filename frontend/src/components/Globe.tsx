@@ -4,6 +4,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 interface Earthquake {
    id: string;
+   time: string;
    place: string;
    latitude: number;
    longitude: number;
@@ -11,7 +12,6 @@ interface Earthquake {
    mag: number;
    status: string;
 }
-
 interface GlobeProps {
   earthquakes: Earthquake[];
 }
@@ -63,7 +63,7 @@ const Globe: React.FC<GlobeProps> = ({ earthquakes }) => {
       while (markers[0]) {
         markers[0].remove();
       }
-
+      console.log(earthquakes);
       // Add new markers
       earthquakes.forEach((earthquake) => {
         const { latitude, longitude, depth, mag, place } = earthquake;

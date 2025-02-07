@@ -14,8 +14,8 @@ try:
     cursor = conn.cursor()
 
     # Example query
-    cursor.execute("SELECT * FROM Earthquakes;")
-    #cursor.execute("LOAD DATA INFILE \"C:\workspace\sp25_p1_t1\earthquake_data_2020_2025.csv\" INTO TABLE Earthquakes FIELDS TERMINATED BY ',' IGNORE 1 ROWS;")
+    #cursor.execute("SELECT * FROM Earthquakes;")
+    cursor.execute("LOAD DATA INFILE \"C:\workspace\sp25_p1_t1\earthquake_data_2020_2025.csv\" INTO TABLE Earthquakes FIELDS TERMINATED BY ',' IGNORE 1 ROWS;")
 
     result = cursor.fetchone()
     print("Connected! Current id:", result[0])

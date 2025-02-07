@@ -62,9 +62,10 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
          const rawData = response.data;
 
          const earthquakes = transformData(rawData);
+         console.log(earthquakes.length);
          console.log(rawData);
 
-         onEarthquakesUpdate(earthquakes);
+         onEarthquakesUpdate(rawData);
          setNumEarthquakes(0);
       }
       catch (error) {

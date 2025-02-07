@@ -18,6 +18,7 @@ interface EarthquakeFilterDropdownProps {
 const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onEarthquakesUpdate }) => {
    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+
    return (
       <div className="relative">
          {/* Dropdown Trigger */}

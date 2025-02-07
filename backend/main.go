@@ -141,11 +141,28 @@ func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 }
 
 // function to get earthquakes from aws
+// function to get earthquakes from aws
 func getEarthquakes(db *sql.DB) http.HandlerFunc {
 	log.Println("EARTHQUAKES")
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		rows, err := db.Query("SELECT id, time, latitude, longitude, depth, mag, place, status FROM Earthquakes;")
+		// Extract query parameters
+		startTime := r.URL.Query().Get("startTime")
+		endTime := r.URL.Query().Get("endTime")
+		minMagnitude := r.URL.Query().Get("minMagnitude")
+		maxMagnitude := r.URL.Query().Get("maxMagnitude")
+		minDepth := r.URL.Query().Get("minDepth")
+		maxDepth := r.URL.Query().Get("maxDepth")
+
+		// Build the SQL query with the parameters
+		query := `
+            SELECT id, time, latitude, longitude, depth, mag, place, status
+            FROM Earthquakes
+            WHERE time BETWEEN ? AND ?
+            AND mag BETWEEN ? AND ?
+            AND depth BETWEEN ? AND ?
+        `
+		rows, err := db.Query(query, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -154,9 +171,11 @@ func getEarthquakes(db *sql.DB) http.HandlerFunc {
 		earthquakes := []Earthquake{}
 		for rows.Next() {
 			var e Earthquake
-			if err := rows.Scan(&e.Id, &e.Time, &e.Latitude, &e.Longitude, &e.Depth, &e.Mag, &e.Place, &e.Status); err != nil {
+			var timeBytes []byte
+			if err := rows.Scan(&e.Id, &timeBytes, &e.Latitude, &e.Longitude, &e.Depth, &e.Mag, &e.Place, &e.Status); err != nil {
 				log.Fatal(err)
 			}
+			e.Time = string(timeBytes)
 			earthquakes = append(earthquakes, e)
 		}
 		if err := rows.Err(); err != nil {

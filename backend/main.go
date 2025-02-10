@@ -68,39 +68,23 @@ func main() {
 	db := connectWithRetry(dsn)
 	defer db.Close()
 
-	/*db, err := sql.Open("mysql", os.Getenv("DATABASE_URL"))
-	if err != nil {
-		log.Println("Database failed")
-		log.Fatal(err)
-	}
-	*/
-	//defer db.Close()
-
 	log.Println("Successfully connected to Database")
 
 	// create table if not exists
 	//declaring err
 	//var err error
 
-	// _, err = db.Exec(`CREATE TABLE IF NOT EXISTS users (
-	//     id INT AUTO_INCREMENT PRIMARY KEY,
-	//     name TEXT,
-	//     email TEXT,
-	// 	password TEXT NOT NULL
-	// // )`)
-	// if err != nil {
-	// 	log.Fatalf("Error creating table: %v", err)
-	// }
-
 	// User routes
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")           // Get all users
-	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")        // Create a new user (signup)
-	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")         // User login
-	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")       // Get user by ID
-	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")    // Update user
-	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE") // Delete user
+	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")                          // Get all users
+	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")                       // Create a new user (signup)
+	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")                        // User login
+	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")                      // Get user by ID
+	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")                   // Update user
+	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE")                // Delete user
+	router.HandleFunc("api/go/users/preferences", createUserPreferences(db)).Methods("POST") // Create user preferences
+	//router.HandleFunc("api/go/users/preferences/{id}", getUserPreferences(db)).Methods("GET") // Get user preferences
 
 	//add router decleration for quering earthquake data
 	router.HandleFunc("/api/go/earthquakes", getEarthquakes(db)).Methods("GET") // Get all earthquakes
@@ -138,6 +122,57 @@ func jsonContentTypeMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
+}
+
+/*
+INSERT INTO UserPreferences (user_id, start_time, end_time, min_mag, max_mag, min_depth, max_depth)
+VALUES ('user123', '2025-01-01 00:00:00', '2025-12-31 23:59:59', 3.0, 7.5, 5.0, 100.0)
+ON DUPLICATE KEY UPDATE
+    start_time = VALUES(start_time),
+    end_time = VALUES(end_time),
+    min_mag = VALUES(min_mag),
+    max_mag = VALUES(max_mag),
+    min_depth = VALUES(min_depth),
+    max_depth = VALUES(max_depth);
+
+
+*/
+
+// save user preferences
+func createUserPreferences(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Saving user preferences")
+
+		userID := r.URL.Query().Get("userID")
+		startTime := r.URL.Query().Get("startTime")
+		endTime := r.URL.Query().Get("endTime")
+		minMagnitude := r.URL.Query().Get("minMagnitude")
+		maxMagnitude := r.URL.Query().Get("maxMagnitude")
+		minDepth := r.URL.Query().Get("minDepth")
+		maxDepth := r.URL.Query().Get("maxDepth")
+
+		query := `
+            INSERT INTO UserPreferences (user_id, start_time, end_time, min_mag, max_mag, min_depth, max_depth)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE 
+                start_time = VALUES(start_time),
+                end_time = VALUES(end_time),
+                min_mag = VALUES(min_mag),
+                max_mag = VALUES(max_mag),
+                min_depth = VALUES(min_depth),
+                max_depth = VALUES(max_depth);
+        `
+
+		_, err := db.Exec(query, userID, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)
+		if err != nil {
+			http.Error(w, "Failed to save preferences", http.StatusInternalServerError)
+			log.Println("Error saving preferences:", err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Preferences saved successfully"))
+	}
 }
 
 // function to get earthquakes from aws

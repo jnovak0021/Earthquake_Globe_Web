@@ -54,6 +54,20 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
       status: item.Status
    }));
    };
+   //method to save user preferences
+   const saveUserPreferences = async () => {
+
+      //try to send a post request to the backend api to save user preferences
+      try {
+         const response = await axios.get("http://localhost:8080/api/go/users/preferences?userID=" + 1 + "startTime=" + startTime + "&endTime=" + endTime + "&minMagnitude=" + minMagnitude + "&maxMagnitude=" + maxMagnitude + "&minDepth=" + minDepth + "&maxDepth=" + maxDepth);
+
+         console.log("User preferences", response.data);
+      } catch (error) {
+         console.error("Error saving user preferences:", error);
+      }
+   };
+
+
    //method to query backend api api/go/earthquakes 
    //will send a json string a fetch a json string
    const fetchEarthquakeJSON = async () => {
@@ -109,6 +123,11 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
          <button onClick={fetchEarthquakeJSON} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
             {/* {loading ? "Loading..." : "Get Data"} */}
             Update Earthquakes
+         </button>
+         
+         <button onClick={saveUserPreferences} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+            {/* {loading ? "Loading..." : "Get Data"} */}
+            Save preferences
          </button>
          {/* <button onClick={handleApiCall} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600" disabled={loading}>
             {loading ? "Loading..." : "Get Data"}

@@ -28,7 +28,8 @@ const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onE
          console.log("Saving preferences for user:", userId); // Log userId here
 
          try {
-            const response = await axios.post("https://earthquake-globe-web-0wajea.fly.dev/api/go/users/preferences", {
+            //const response = await axios.post("https://earthquake-globe-web-0wajea.fly.dev/api/go/users/preferences", {
+            const response = await axios.post("http://localhost:8080/api/go/users/preferences", {
                userId,
                startTime,
                endTime,
@@ -58,7 +59,7 @@ const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onE
             <div className="absolute top-20 right-12 w-80 bg-gray-800 bg-opacity-80 p-2 rounded-lg shadow-lg max-h-[700px] overflow-y-auto">
                <h1 className="text-xl font-bold text-white mb-4">Earthquake Filter</h1>
                {/* Pass userId here */}
-               <EarthquakeFilter onEarthquakesUpdate={onEarthquakesUpdate} userId={userId} saveUserPreferences={handleSavePreferences} />
+               <EarthquakeFilter onEarthquakesUpdate={onEarthquakesUpdate} saveUserPreferences={handleSavePreferences} />
             </div>
          )}
       </div>

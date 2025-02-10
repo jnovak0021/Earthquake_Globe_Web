@@ -63,6 +63,7 @@ const Globe: React.FC<GlobeProps> = ({ earthquakes }) => {
          while (markers[0]) {
             markers[0].remove();
          }
+         console.log("Earthquakes in globe.tsx:");
          console.log(earthquakes);
          // Add new markers
          earthquakes.forEach((earthquake) => {

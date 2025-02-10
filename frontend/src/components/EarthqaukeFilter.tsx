@@ -1,16 +1,16 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-interface RawEarthquakeData {
-   Id: string;
-   Time: string;
-   Latitude: string;
-   Longitude: string;
-   Depth: string;
-   Mag: string;
-   Place: string;
-   Status: string;
-}
+// interface RawEarthquakeData {
+//    Id: string;
+//    Time: string;
+//    Latitude: string;
+//    Longitude: string;
+//    Depth: string;
+//    Mag: string;
+//    Place: string;
+//    Status: string;
+// }
 
 interface Earthquake {
    id: string;
@@ -25,11 +25,11 @@ interface Earthquake {
 
 interface EarthquakeFilterProps {
    onEarthquakesUpdate: (earthquakes: Earthquake[]) => void;
-   userId: string; // Pass userId here from index.tsx
+   //userId: string; // Pass userId here from index.tsx
    saveUserPreferences: (startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => Promise<void>;
 }
 
-const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate, userId, saveUserPreferences }) => {
+const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate, saveUserPreferences }) => {
    const [startTime, setStartTime] = useState("2020-01-01");
    const [endTime, setEndTime] = useState("2025-01-01");
    const [minMagnitude, setMinMagnitude] = useState(0);
@@ -39,27 +39,29 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
    const [numEarthquakes, setNumEarthquakes] = useState(0);
 
    // Function to transform raw data into Earthquake interface
-   const transformData = (data: RawEarthquakeData[]): Earthquake[] => {
-      return data.map((item) => ({
-         id: item.Id,
-         time: item.Time,
-         place: item.Place,
-         latitude: parseFloat(item.Latitude),
-         longitude: parseFloat(item.Longitude),
-         depth: parseFloat(item.Depth),
-         mag: parseFloat(item.Mag),
-         status: item.Status,
-      }));
-   };
+   // const transformData = (data: RawEarthquakeData[]): Earthquake[] => {
+   //    return data.map((item) => ({
+   //       id: item.Id,
+   //       time: item.Time,
+   //       place: item.Place,
+   //       latitude: parseFloat(item.Latitude),
+   //       longitude: parseFloat(item.Longitude),
+   //       depth: parseFloat(item.Depth),
+   //       mag: parseFloat(item.Mag),
+   //       status: item.Status,
+   //    }));
+   // };
 
    // Method to query backend API for earthquake data
    const fetchEarthquakeJSON = async () => {
       console.log("Fetching Earthquake JSON from backend");
 
       try {
-         const response = await axios.get("https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes", {
+         //const response = await axios.get("https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes", {
+
+         const response = await axios.get("http://localhost:8080/api/go/earthquakes", {
             params: {
-               userId, // Send userId in the request if needed
+               //userId, // Send userId in the request if needed
                startTime,
                endTime,
                minMagnitude,
@@ -70,11 +72,12 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
          });
 
          const rawData = response.data;
-         const earthquakes = transformData(rawData);
+         //const earthquakes = transformData(rawData);
 
-         console.log("Earthquake data fetched:", earthquakes.length);
-         onEarthquakesUpdate(earthquakes);
-         setNumEarthquakes(earthquakes.length);
+         console.log("Earthquake data fetched:", rawData.length);
+         console.log(rawData);
+         onEarthquakesUpdate(rawData);
+         setNumEarthquakes(rawData.length);
       } catch (error) {
          console.error("Error fetching earthquake data:", error);
       }

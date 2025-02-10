@@ -57,9 +57,8 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
       console.log("Fetching Earthquake JSON from backend");
 
       try {
-         //const response = await axios.get("https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes", {
-
-         const response = await axios.get("http://localhost:8080/api/go/earthquakes", {
+         const response = await axios.get("https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes", {
+         //const response = await axios.get("http://localhost:8080/api/go/earthquakes", {
             params: {
                //userId, // Send userId in the request if needed
                startTime,

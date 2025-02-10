@@ -1,3 +1,19 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:00112ae9196b45de920ec8a19d765b45ebcec792b044996c78876c12e3974b3c
-size 447
+{
+  "dependencies": {
+    "@types/mapbox-gl": "^3.4.1",
+    "axios": "^1.7.9",
+    "lucide-react": "^0.474.0",
+    "mapbox-gl": "^3.9.4",
+    "next": "^14.2.23",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.172.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@types/three": "^0.172.0",
+    "typescript": "^5.7.3"
+  }
+}

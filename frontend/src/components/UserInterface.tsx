@@ -13,8 +13,8 @@ interface UserInterfaceProps {
 }
 
 const UserInterface: React.FC<UserInterfaceProps> = ({ backendName }) => {
-   //const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://earthquake-globe-web-0wajea.fly.dev";
-   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://earthquake-globe-web-0wajea.fly.dev";
+   //const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
    const [users, setUsers] = useState<User[]>([]);
    const [newUser, setNewUser] = useState({ name: "", email: "" });

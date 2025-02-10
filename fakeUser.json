@@ -1,14 +1,3 @@
-[
-    {
-        "username": "alice123",
-        "password": "P@ssw0rd1"
-    },
-    {
-        "username": "bob456",
-        "password": "SecurePass!23"
-    },
-    {
-        "username": "charlie789",
-        "password": "MyStr0ngPass99"
-    }
-]
+version https://git-lfs.github.com/spec/v1
+oid sha256:984b4b17aa4024f63f06ee2d9de5381f40f1bf1a90afa3d536f1ee4da11b541d
+size 255

@@ -28,7 +28,7 @@ const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onE
          console.log("Saving preferences for user:", userId); // Log userId here
 
          try {
-            const response = await axios.post("http://localhost:8080/api/go/users/preferences", {
+            const response = await axios.post("https://earthquake-globe-web-0wajea.fly.dev/api/go/users/preferences", {
                userId,
                startTime,
                endTime,

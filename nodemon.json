@@ -1,5 +1,3 @@
-{
-    "watch": ["backend", "frontend"],
-    "ext": "go,js,jsx,ts,tsx,json",
-    "exec": "docker-compose up --build"
-  }
+version https://git-lfs.github.com/spec/v1
+oid sha256:ff54020705e04d971ef581fc7e032f7c8460dd10056b6a8e98d1ed86a8f208f1
+size 123

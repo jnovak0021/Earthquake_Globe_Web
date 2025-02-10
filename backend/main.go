@@ -21,7 +21,8 @@ type User struct {
 }
 
 type Earthquake struct {
-	Id        string  `json:"id"`
+	//Id        int     `json:"id"`
+	Id    string  `json:"id"`
 	Time      string  `json:"time"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
@@ -30,6 +31,19 @@ type Earthquake struct {
 	Place     string  `json:"place"`
 	Status    string  `json:"status"`
 }
+
+type UserPreferences struct {
+    ID         int     `json:"id"`         // ID field for unique identifier
+    UserId     int     `json:"user_id"`     // Link to the user (foreign key)
+    StartTime  string  `json:"start_time"`  // Start time for the preference filter
+    EndTime    string  `json:"end_time"`    // End time for the preference filter
+    MinMag     float64 `json:"min_mag"`     // Minimum magnitude for filter
+    MaxMag     float64 `json:"max_mag"`     // Maximum magnitude for filter
+    MinDepth   float64 `json:"min_depth"`   // Minimum depth for filter
+    MaxDepth   float64 `json:"max_depth"`   // Maximum depth for filter
+}
+
+
 
 func connectWithRetry(dsn string) *sql.DB {
 	var db *sql.DB
@@ -83,8 +97,8 @@ func main() {
 	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")                      // Get user by ID
 	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")                   // Update user
 	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE")                // Delete user
-	router.HandleFunc("api/go/users/preferences", createUserPreferences(db)).Methods("POST") // Create user preferences
-	//router.HandleFunc("api/go/users/preferences/{id}", getUserPreferences(db)).Methods("GET") // Get user preferences
+	router.HandleFunc("/api/go/users/preferences", createUserPreferences(db)).Methods("POST") // Create user preferences
+	router.HandleFunc("/api/go/users/preferences/{id}", getUserPreferences(db)).Methods("GET") // Get user preferences
 
 	//add router decleration for quering earthquake data
 	router.HandleFunc("/api/go/earthquakes", getEarthquakes(db)).Methods("GET") // Get all earthquakes
@@ -138,20 +152,31 @@ ON DUPLICATE KEY UPDATE
 
 */
 
-// save user preferences
+
 func createUserPreferences(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Saving user preferences")
+    return func(w http.ResponseWriter, r *http.Request) {
+        log.Println("Saving user preferences")
 
-		userID := r.URL.Query().Get("userID")
-		startTime := r.URL.Query().Get("startTime")
-		endTime := r.URL.Query().Get("endTime")
-		minMagnitude := r.URL.Query().Get("minMagnitude")
-		maxMagnitude := r.URL.Query().Get("maxMagnitude")
-		minDepth := r.URL.Query().Get("minDepth")
-		maxDepth := r.URL.Query().Get("maxDepth")
+        var preferences UserPreferences
+        err := json.NewDecoder(r.Body).Decode(&preferences)
+        if err != nil {
+            http.Error(w, "Invalid request body", http.StatusBadRequest)
+            return
+        }
 
-		query := `
+		log.Printf("Received user ID: %d", preferences.UserId)
+
+
+        // Check if the user exists in the users table
+        var userExists bool
+        err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)", preferences.UserId).Scan(&userExists)
+        if err != nil || !userExists {
+            http.Error(w, "User does not exist", http.StatusBadRequest)
+            log.Println("User does not exist:", preferences.UserId)
+            return
+        }
+
+        query := `
             INSERT INTO UserPreferences (user_id, start_time, end_time, min_mag, max_mag, min_depth, max_depth)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE 
@@ -163,17 +188,68 @@ func createUserPreferences(db *sql.DB) http.HandlerFunc {
                 max_depth = VALUES(max_depth);
         `
 
-		_, err := db.Exec(query, userID, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)
-		if err != nil {
-			http.Error(w, "Failed to save preferences", http.StatusInternalServerError)
-			log.Println("Error saving preferences:", err)
-			return
-		}
+        _, err = db.Exec(query, preferences.UserId, preferences.StartTime, preferences.EndTime, preferences.MinMag, preferences.MaxMag, preferences.MinDepth, preferences.MaxDepth)
+        if err != nil {
+            http.Error(w, "Failed to save preferences", http.StatusInternalServerError)
+            log.Println("Error saving preferences:", err)
+            return
+        }
 
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Preferences saved successfully"))
-	}
+        w.WriteHeader(http.StatusOK)
+        w.Write([]byte("Preferences saved successfully"))
+    }
 }
+
+
+
+func getUserPreferences(db *sql.DB) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        log.Println("Retrieving user preferences")
+
+        // Extract user ID from the URL path
+        vars := mux.Vars(r)
+        userID := vars["id"]
+
+        // Query to retrieve preferences using user_id
+        query := `
+            SELECT id, start_time, end_time, min_mag, max_mag, min_depth, max_depth
+            FROM UserPreferences
+            WHERE user_id = ?`
+
+        // Execute the query
+        rows, err := db.Query(query, userID)
+        if err != nil {
+            http.Error(w, "Error retrieving user preferences", http.StatusInternalServerError)
+            log.Printf("Error retrieving user preferences: %v", err)
+            return
+        }
+        defer rows.Close()
+
+        // Parse the rows into a struct and send back to the user
+        var preferences []UserPreferences
+        for rows.Next() {
+            var preference UserPreferences
+            if err := rows.Scan(&preference.ID, &preference.StartTime, &preference.EndTime, &preference.MinMag, &preference.MaxMag, &preference.MinDepth, &preference.MaxDepth); err != nil {
+                http.Error(w, "Error reading user preferences", http.StatusInternalServerError)
+                log.Printf("Error reading user preferences: %v", err)
+                return
+            }
+            preferences = append(preferences, preference)
+        }
+
+        // Send the preferences as a JSON response
+        w.Header().Set("Content-Type", "application/json")
+        if err := json.NewEncoder(w).Encode(preferences); err != nil {
+            http.Error(w, "Error encoding preferences", http.StatusInternalServerError)
+            log.Printf("Error encoding preferences: %v", err)
+        }
+    }
+}
+
+
+
+
+
 
 // function to get earthquakes from aws
 // function to get earthquakes from aws

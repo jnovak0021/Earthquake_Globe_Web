@@ -1,12 +1,6 @@
 import { useState } from "react";
 
-interface User {
-   id: number;
-   name: string;
-   email: string;
-}
-
-export default function Login({ setIsLoggedIn, setUser }: { setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; setUser: React.Dispatch<React.SetStateAction<User | null>> }) {
+export default function Login({ setIsLoggedIn, setUser }: { setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>; setUser: React.Dispatch<React.SetStateAction<string | null>> }) {
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
    const [name, setName] = useState(""); // Name state for sign-up
@@ -16,6 +10,7 @@ export default function Login({ setIsLoggedIn, setUser }: { setIsLoggedIn: React
 
    const handleLogin = async (e: React.FormEvent) => {
       e.preventDefault();
+      console.log("Login attempt with email:", email); // Debugging
 
       try {
          const response = await fetch("http://localhost:8080/api/go/login", {
@@ -25,20 +20,25 @@ export default function Login({ setIsLoggedIn, setUser }: { setIsLoggedIn: React
          });
 
          const data = await response.json();
+         console.log("Login response:", data); // Debugging the login response
+
          if (response.ok) {
-            setUser({ id: data.id, name: data.name, email: data.email }); // Store user info
+            console.log("Login successful, user ID:", data.id); // Debugging user ID
+            setUser(data.id); // Set user ID as a string (instead of a User object)
             setIsLoggedIn(true); // Mark user as logged in
          } else {
+            console.log("Login failed with message:", data.message); // Debugging failure case
             setErrorMessage(data.message || "Invalid email or password.");
          }
       } catch (error) {
-         console.error("Error:", error);
+         console.error("Error during login:", error); // Debugging error
          setErrorMessage("Something went wrong!");
       }
    };
 
    const handleCreateAccount = async (e: React.FormEvent) => {
       e.preventDefault();
+      console.log("Creating account with email:", email); // Debugging
 
       if (!email || !password || !name) {
          setErrorMessage("Please fill out all fields.");
@@ -53,14 +53,17 @@ export default function Login({ setIsLoggedIn, setUser }: { setIsLoggedIn: React
          });
 
          const data = await response.json();
+         console.log("Account creation response:", data); // Debugging the account creation response
+
          if (response.ok) {
             setAccountCreated(true);
             setErrorMessage(""); // Clear errors
+            console.log("Account created successfully!"); // Debugging success
          } else {
             setErrorMessage(data.message || "Failed to create account.");
          }
       } catch (error) {
-         console.error("Error:", error);
+         console.error("Error during account creation:", error); // Debugging error
          setErrorMessage("Something went wrong!");
       }
    };

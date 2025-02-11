@@ -18,7 +18,7 @@ interface Earthquake {
 export default function Index() {
    const [isLoggedIn, setIsLoggedIn] = useState(false);
    const [earthquakes, setEarthquakes] = useState<Earthquake[]>([]);
-   const [userId, setUserId] = useState<string | null>(null); // Track userId
+   const [userEmail, setUserEmail] = useState<string | null>(null); // Track userEmail
 
    // Function to handle updated earthquake data
    const handleEarthquakesUpdate = (newEarthquakes: Earthquake[]) => {
@@ -26,19 +26,22 @@ export default function Index() {
    };
 
    // Function to save user preferences when they apply a filter
-   const handleSaveUserPreferences = async (startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => {
-      if (userId) {
+   const handleSaveUserPreferences = async (email: string, startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => {
+      if (email) {
+         const requestData = {
+            email,
+            start_time: startTime,
+            end_time: endTime,
+            min_mag: minMagnitude,
+            max_mag: maxMagnitude,
+            min_depth: minDepth,
+            max_depth: maxDepth,
+         };
+
+         console.log("Fixed Request data:", requestData); // Debugging
+
          try {
-            // Call the saveUserPreferences method from the EarthquakeFilterDropdown
-            await axios.post("http://localhost:8080/api/go/users/preferences", {
-               user_id: userId, // Pass userId directly as a string
-               startTime,
-               endTime,
-               minMagnitude,
-               maxMagnitude,
-               minDepth,
-               maxDepth,
-            });
+            await axios.post("http://localhost:8080/api/go/users/preferences", requestData);
             console.log("User preferences saved successfully!");
          } catch (error) {
             console.error("Error saving user preferences:", error);
@@ -59,8 +62,8 @@ export default function Index() {
          {/* Login or Earthquake Filter Section */}
          {!isLoggedIn ? (
             <div className="flex justify-center items-center z-10 w-full h-full">
-               {/* Pass setUserId when the user logs in */}
-               <Login setIsLoggedIn={setIsLoggedIn} setUser={setUserId} />
+               {/* Pass setUserEmail when the user logs in */}
+               <Login setIsLoggedIn={setIsLoggedIn} setUser={setUserEmail} />
             </div>
          ) : (
             <div className="flex w-full h-screen z-10">
@@ -74,11 +77,11 @@ export default function Index() {
 
                {/* Earthquake Filter Dropdown (Top Right) */}
                <div className="absolute top-5 right-5 z-20">
-                  {/* Pass userId as a string */}
-                  {userId && (
+                  {/* Pass userEmail */}
+                  {userEmail && (
                      <EarthquakeFilterDropdown
                         onEarthquakesUpdate={handleEarthquakesUpdate}
-                        userId={userId} // Pass userId as a string
+                        userEmail={userEmail} // Pass userEmail
                         saveUserPreferences={handleSaveUserPreferences} // Pass the saveUserPreferences function
                      />
                   )}

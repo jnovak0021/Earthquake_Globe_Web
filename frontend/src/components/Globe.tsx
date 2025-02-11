@@ -84,7 +84,7 @@ const Globe: React.FC<GlobeProps> = ({ earthquakes }) => {
                   <span style="color: white;">Magnitude: ${mag}</span><br>
                   <span style="color: white;">Depth: ${depth.toFixed(2)} km</span>
                 </div>`
-             );
+            );
 
             if (mapRef.current) {
                new mapboxgl.Marker(el).setLngLat([longitude, latitude]).setPopup(popup).addTo(mapRef.current);

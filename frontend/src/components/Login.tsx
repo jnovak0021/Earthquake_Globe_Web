@@ -24,8 +24,8 @@ export default function Login({ setIsLoggedIn, setUser }: { setIsLoggedIn: React
          console.log("Login response:", data); // Debugging the login response
 
          if (response.ok) {
-            console.log("Login successful, user ID:", data.id); // Debugging user ID
-            setUser(data.id); // Set user ID as a string (instead of a User object)
+            console.log("Login successful, user email:", data.email); // Log user email
+            setUser(data.email); // Set user email (instead of userId)
             setIsLoggedIn(true); // Mark user as logged in
          } else {
             console.log("Login failed with message:", data.message); // Debugging failure case

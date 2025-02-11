@@ -1,16 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
-
-// interface RawEarthquakeData {
-//    Id: string;
-//    Time: string;
-//    Latitude: string;
-//    Longitude: string;
-//    Depth: string;
-//    Mag: string;
-//    Place: string;
-//    Status: string;
-// }
+import React, { useState, useEffect } from "react";
 
 interface Earthquake {
    id: string;
@@ -25,11 +14,19 @@ interface Earthquake {
 
 interface EarthquakeFilterProps {
    onEarthquakesUpdate: (earthquakes: Earthquake[]) => void;
-   //userId: string; // Pass userId here from index.tsx
-   saveUserPreferences: (startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => Promise<void>;
+   saveUserPreferences: (email: string, startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => Promise<void>;
+   userEmail: string;
+   savedPreferences: { start_time: string; end_time: string; min_mag: number; max_mag: number; min_depth: number; max_depth: number } | null;
+   updateUserPreferences: React.Dispatch<React.SetStateAction<{ start_time: string; end_time: string; min_mag: number; max_mag: number; min_depth: number; max_depth: number } | null>>;
 }
 
-const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate, saveUserPreferences }) => {
+// Function to format date correctly
+const formatDate = (dateString: string | null) => {
+   if (!dateString) return "";
+   return dateString.split(" ")[0]; // Converts "yyyy-MM-dd HH:mm:ss" → "yyyy-MM-dd"
+};
+
+const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate, saveUserPreferences, userEmail, savedPreferences, updateUserPreferences }) => {
    const [startTime, setStartTime] = useState("2020-01-01");
    const [endTime, setEndTime] = useState("2025-01-01");
    const [minMagnitude, setMinMagnitude] = useState(0);
@@ -38,34 +35,21 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
    const [maxDepth, setMaxDepth] = useState(1000);
    const [numEarthquakes, setNumEarthquakes] = useState(0);
 
-   // Function to transform raw data into Earthquake interface
-   // const transformData = (data: RawEarthquakeData[]): Earthquake[] => {
-   //    return data.map((item) => ({
-   //       id: item.Id,
-   //       time: item.Time,
-   //       place: item.Place,
-   //       latitude: parseFloat(item.Latitude),
-   //       longitude: parseFloat(item.Longitude),
-   //       depth: parseFloat(item.Depth),
-   //       mag: parseFloat(item.Mag),
-   //       status: item.Status,
-   //    }));
-   // };
+   useEffect(() => {
+      if (savedPreferences) {
+         setStartTime(formatDate(savedPreferences.start_time));
+         setEndTime(formatDate(savedPreferences.end_time));
+         setMinMagnitude(savedPreferences.min_mag);
+         setMaxMagnitude(savedPreferences.max_mag);
+         setMinDepth(savedPreferences.min_depth);
+         setMaxDepth(savedPreferences.max_depth);
+      }
+   }, [savedPreferences]);
 
-   //const fetch earthquake count
-   // const fetchEarthquakeCount = async () => {
-   //    const response = await axios.get("http://localhost:8080/api/go/earthquakes/count");
-   // }  
-
-   // Method to query backend API for earthquake data
    const fetchEarthquakeJSON = async () => {
-      console.log("Fetching Earthquake JSON from backend");
-
       try {
-         //const response = await axios.get("https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes", {
          const response = await axios.get("http://localhost:8080/api/go/earthquakes", {
             params: {
-               //userId, // Send userId in the request if needed
                startTime,
                endTime,
                minMagnitude,
@@ -75,70 +59,82 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
             },
          });
 
-         const rawData = response.data;
-         //const earthquakes = transformData(rawData);
-
-         console.log("Earthquake data fetched:", rawData.length);
-         console.log(rawData);
-         onEarthquakesUpdate(rawData);
-         setNumEarthquakes(rawData.length);
+         onEarthquakesUpdate(response.data);
+         setNumEarthquakes(response.data.length);
       } catch (error) {
          console.error("Error fetching earthquake data:", error);
       }
    };
 
+   const handleSavePreferences = async () => {
+      await saveUserPreferences(userEmail, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth);
+
+      const updatedPreferences = {
+         start_time: startTime,
+         end_time: endTime,
+         min_mag: minMagnitude,
+         max_mag: maxMagnitude,
+         min_depth: minDepth,
+         max_depth: maxDepth,
+      };
+
+      // Save to `localStorage`
+      localStorage.setItem(`preferences_${userEmail}`, JSON.stringify(updatedPreferences));
+
+      // Update UI instantly
+      updateUserPreferences(updatedPreferences);
+      console.log("Preferences saved and updated in UI:", updatedPreferences);
+   };
+
    return (
       <div className="bg-gray-200 p-4 rounded-lg shadow-md">
+         {/* Start Time */}
          <div className="mb-4">
-            <label htmlFor="startTime" className="block text-sm font-medium text-gray-700">
-               Start Time
-            </label>
-            <input type="date" id="startTime" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-gray-700">Start Time</label>
+            <input type="date" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md" />
          </div>
 
+         {/* End Time */}
          <div className="mb-4">
-            <label htmlFor="endTime" className="block text-sm font-medium text-gray-700">
-               End Time
-            </label>
-            <input type="date" id="endTime" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-gray-700">End Time</label>
+            <input type="date" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="block w-full px-3 py-2 border border-gray-300 rounded-md" />
          </div>
 
+         {/* Min Magnitude */}
          <div className="mb-4">
-            <label htmlFor="minMagnitude" className="block text-sm font-medium text-gray-700">
-               Min Magnitude
-            </label>
-            <input type="number" id="minMagnitude" value={minMagnitude} onChange={(e) => setMinMagnitude(Number(e.target.value))} min={0} max={10} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-gray-700">Min Magnitude</label>
+            <input type="number" value={minMagnitude} onChange={(e) => setMinMagnitude(Number(e.target.value))} className="block w-full px-3 py-2 border border-gray-300 rounded-md" />
          </div>
 
+         {/* Max Magnitude */}
          <div className="mb-4">
-            <label htmlFor="maxMagnitude" className="block text-sm font-medium text-gray-700">
-               Max Magnitude
-            </label>
-            <input type="number" id="maxMagnitude" value={maxMagnitude} onChange={(e) => setMaxMagnitude(Number(e.target.value))} min={0} max={10} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-gray-700">Max Magnitude</label>
+            <input type="number" value={maxMagnitude} onChange={(e) => setMaxMagnitude(Number(e.target.value))} className="block w-full px-3 py-2 border border-gray-300 rounded-md" />
          </div>
 
+         {/* Min Depth */}
          <div className="mb-4">
-            <label htmlFor="minDepth" className="block text-sm font-medium text-gray-700">
-               Min Depth
-            </label>
-            <input type="number" id="minDepth" value={minDepth} onChange={(e) => setMinDepth(Number(e.target.value))} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-gray-700">Min Depth</label>
+            <input type="number" value={minDepth} onChange={(e) => setMinDepth(Number(e.target.value))} className="block w-full px-3 py-2 border border-gray-300 rounded-md" />
          </div>
 
+         {/* Max Depth */}
          <div className="mb-4">
-            <label htmlFor="maxDepth" className="block text-sm font-medium text-gray-700">
-               Max Depth
-            </label>
-            <input type="number" id="maxDepth" value={maxDepth} onChange={(e) => setMaxDepth(Number(e.target.value))} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-gray-700">Max Depth</label>
+            <input type="number" value={maxDepth} onChange={(e) => setMaxDepth(Number(e.target.value))} className="block w-full px-3 py-2 border border-gray-300 rounded-md" />
          </div>
 
+         {/* Update Earthquakes Button */}
          <button onClick={fetchEarthquakeJSON} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
             Update Earthquakes
          </button>
 
-         <button onClick={() => saveUserPreferences(startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mt-2">
+         {/* Save Preferences Button */}
+         <button onClick={handleSavePreferences} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mt-2">
             Save Preferences
          </button>
 
+         {/* Display Total Earthquakes */}
          <div className="mt-4">
             <h1 className="text-black">Total Earthquakes: {numEarthquakes}</h1>
          </div>

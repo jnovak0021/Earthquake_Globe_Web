@@ -189,7 +189,7 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
    <div className="bg-gray-800 bg-opacity-80 z-50 p-4 rounded-lg shadow-lg">
       {/* Note about shift click */}
       <div className="mt-4">
-        <p className="text-black text-sm italic">
+        <p className="text-white text-sm italic">
           SHIFT + Click to select area
         </p>
       </div>

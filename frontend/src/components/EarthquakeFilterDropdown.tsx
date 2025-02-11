@@ -60,13 +60,13 @@ const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onE
 
    return (
       <div className="relative">
-         <button onClick={() => setIsDropdownOpen((prev) => !prev)} className="absolute top-4 right-6 bg-transparent text-white border-none cursor-pointer text-lg font-semibold flex items-center whitespace-nowrap">
+         <button onClick={() => setIsDropdownOpen((prev) => !prev)} className="absolute top-4 right-6 bg-gray-700 hover:bg-gray-600 text-white border-none cursor-pointer text-lg font-semibold flex items-center whitespace-nowrap p-2 rounded-md">
             Apply Earthquake Filter <span className="ml-2">&#9660;</span>
          </button>
 
          {isDropdownOpen && (
-            <div className="absolute top-20 right-12 w-80 bg-gray-800 bg-opacity-80 p-2 rounded-lg shadow-lg max-h-[700px] overflow-y-auto">
-               <h1 className="text-xl font-bold text-gray-600 mb-4">Earthquake Filter</h1>
+            <div className="absolute top-20 right-12 w-[350px] bg-gray-800 bg-opacity-80 p-4 rounded-lg shadow-lg max-h-[700px] overflow-y-auto">
+               <h1 className="text-xl font-bold text-gray-300 mb-4">Earthquake Filter</h1>
                <EarthquakeFilter onEarthquakesUpdate={onEarthquakesUpdate} saveUserPreferences={saveUserPreferences} userEmail={userEmail} savedPreferences={userPreferences} updateUserPreferences={setUserPreferences} />
             </div>
          )}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import EarthquakeFilter from "./EarthqaukeFilter";
 
@@ -13,53 +13,59 @@ interface Earthquake {
    status: string;
 }
 
-interface EarthquakeFilterDropdownProps {
-   onEarthquakesUpdate: (earthquakes: Earthquake[]) => void;
-   userId: string; // Pass userId here from index.tsx
-   saveUserPreferences: (startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => Promise<void>; // Define the function signature here
+interface UserPreferences {
+   start_time: string;
+   end_time: string;
+   min_mag: number;
+   max_mag: number;
+   min_depth: number;
+   max_depth: number;
 }
 
-const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onEarthquakesUpdate, userId }) => {
+interface EarthquakeFilterDropdownProps {
+   onEarthquakesUpdate: (earthquakes: Earthquake[]) => void;
+   userEmail: string;
+   saveUserPreferences: (email: string, startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => Promise<void>;
+}
+
+const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onEarthquakesUpdate, saveUserPreferences, userEmail }) => {
    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
 
-   // This function will be passed to EarthquakeFilter to save the user's preferences
-   const handleSavePreferences = async (startTime: string, endTime: string, minMagnitude: number, maxMagnitude: number, minDepth: number, maxDepth: number) => {
-      if (userId) {
-         console.log("Saving preferences for user:", userId); // Log userId here
+   const fetchUserPreferences = async () => {
+      if (!userEmail) return;
 
-         try {
-            //const response = await axios.post("https://earthquake-globe-web-0wajea.fly.dev/api/go/users/preferences", {
-            const response = await axios.post("http://localhost:8080/api/go/users/preferences", {
-               userId,
-               startTime,
-               endTime,
-               minMagnitude,
-               maxMagnitude,
-               minDepth,
-               maxDepth,
-            });
-            console.log("Preferences saved successfully:", response.data);
-         } catch (error) {
-            console.error("Error saving preferences:", error);
+      const storedPreferences = localStorage.getItem(`preferences_${userEmail}`);
+      if (storedPreferences) {
+         setUserPreferences(JSON.parse(storedPreferences));
+         return;
+      }
+
+      try {
+         const response = await axios.get(`http://localhost:8080/api/go/users/preferences/${userEmail}`);
+         if (response.data.length > 0) {
+            setUserPreferences(response.data[0]);
+            localStorage.setItem(`preferences_${userEmail}`, JSON.stringify(response.data[0]));
          }
-      } else {
-         console.log("No user ID found, unable to save preferences.");
+      } catch (error) {
+         console.error("Error fetching user preferences:", error);
       }
    };
 
+   useEffect(() => {
+      fetchUserPreferences();
+   }, [userEmail]);
+
    return (
       <div className="relative">
-         {/* Dropdown Trigger */}
-         <button onClick={() => setIsDropdownOpen((prev) => !prev)} className="absolute top-4 right-4 bg-transparent text-white border-none cursor-pointer text-lg font-semibold flex items-center whitespace-nowrap">
+         <button onClick={() => setIsDropdownOpen((prev) => !prev)} className="absolute top-4 right-6 bg-transparent text-white border-none cursor-pointer text-lg font-semibold flex items-center whitespace-nowrap">
             Apply Earthquake Filter <span className="ml-2">&#9660;</span>
          </button>
 
-         {/* Dropdown Menu */}
          {isDropdownOpen && (
             <div className="absolute top-20 right-12 w-80 bg-gray-800 bg-opacity-80 p-2 rounded-lg shadow-lg max-h-[700px] overflow-y-auto">
-               <h1 className="text-xl font-bold text-white mb-4">Earthquake Filter</h1>
-               {/* Pass userId here */}
-               <EarthquakeFilter onEarthquakesUpdate={onEarthquakesUpdate} saveUserPreferences={handleSavePreferences} />
+               <h1 className="text-xl font-bold text-gray-600 mb-4">Earthquake Filter</h1>
+               <EarthquakeFilter onEarthquakesUpdate={onEarthquakesUpdate} saveUserPreferences={saveUserPreferences} userEmail={userEmail} savedPreferences={userPreferences} updateUserPreferences={setUserPreferences} />
             </div>
          )}
       </div>

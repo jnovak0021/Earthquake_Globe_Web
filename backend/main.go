@@ -33,8 +33,7 @@ type Earthquake struct {
 }
 
 type UserPreferences struct {
-	ID        int     `json:"id"`         // ID field for unique identifier
-	UserId    int     `json:"user_id"`    // Link to the user (foreign key)
+	Email     string  `json:"email"`      // Link to the user (foreign key)
 	StartTime string  `json:"start_time"` // Start time for the preference filter
 	EndTime   string  `json:"end_time"`   // End time for the preference filter
 	MinMag    float64 `json:"min_mag"`    // Minimum magnitude for filter
@@ -89,14 +88,14 @@ func main() {
 	// User routes
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")                            // Get all users
-	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")                         // Create a new user (signup)
-	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")                          // User login
-	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")                        // Get user by ID
-	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")                     // Update user
-	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE")                  // Delete user
-	router.HandleFunc("/api/go/users/preferences", createUserPreferences(db)).Methods("POST")  // Create user preferences
-	router.HandleFunc("/api/go/users/preferences/{id}", getUserPreferences(db)).Methods("GET") // Get user preferences
+	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")                               // Get all users
+	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")                            // Create a new user (signup)
+	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")                             // User login
+	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")                           // Get user by ID
+	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")                        // Update user
+	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE")                     // Delete user
+	router.HandleFunc("/api/go/users/preferences", createUserPreferences(db)).Methods("POST")     // Create user preferences
+	router.HandleFunc("/api/go/users/preferences/{email}", getUserPreferences(db)).Methods("GET") // Get user preferences
 
 	// add router to retrieve the counts of earthquakes
 	router.HandleFunc("/api/go/earthquakes/count", getEarthquakeCount(db)).Methods("GET")
@@ -164,19 +163,13 @@ func createUserPreferences(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("Received user ID: %d", preferences.UserId)
+		// Log the decoded preferences
+		log.Printf("Received preferences: email=%s, start_time=%s, end_time=%s, min_mag=%f, max_mag=%f, min_depth=%f, max_depth=%f",
+			preferences.Email, preferences.StartTime, preferences.EndTime, preferences.MinMag, preferences.MaxMag, preferences.MinDepth, preferences.MaxDepth)
 
-		// Check if the user exists in the users table
-		var userExists bool
-		err = db.QueryRow("SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)", preferences.UserId).Scan(&userExists)
-		if err != nil || !userExists {
-			http.Error(w, "User does not exist", http.StatusBadRequest)
-			log.Println("User does not exist:", preferences.UserId)
-			return
-		}
-
+		// Query to insert or update user preferences
 		query := `
-            INSERT INTO UserPreferences (user_id, start_time, end_time, min_mag, max_mag, min_depth, max_depth)
+            INSERT INTO UserPreferences (email, start_time, end_time, min_mag, max_mag, min_depth, max_depth)
             VALUES (?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE 
                 start_time = VALUES(start_time),
@@ -187,7 +180,7 @@ func createUserPreferences(db *sql.DB) http.HandlerFunc {
                 max_depth = VALUES(max_depth);
         `
 
-		_, err = db.Exec(query, preferences.UserId, preferences.StartTime, preferences.EndTime, preferences.MinMag, preferences.MaxMag, preferences.MinDepth, preferences.MaxDepth)
+		_, err = db.Exec(query, preferences.Email, preferences.StartTime, preferences.EndTime, preferences.MinMag, preferences.MaxMag, preferences.MinDepth, preferences.MaxDepth)
 		if err != nil {
 			http.Error(w, "Failed to save preferences", http.StatusInternalServerError)
 			log.Println("Error saving preferences:", err)
@@ -203,18 +196,18 @@ func getUserPreferences(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Retrieving user preferences")
 
-		// Extract user ID from the URL path
+		// Extract email from the URL path
 		vars := mux.Vars(r)
-		userID := vars["id"]
+		email := vars["email"]
 
-		// Query to retrieve preferences using user_id
+		// Query to retrieve preferences using email
 		query := `
-            SELECT id, start_time, end_time, min_mag, max_mag, min_depth, max_depth
+            SELECT start_time, end_time, min_mag, max_mag, min_depth, max_depth
             FROM UserPreferences
-            WHERE user_id = ?`
+            WHERE email = ?`
 
 		// Execute the query
-		rows, err := db.Query(query, userID)
+		rows, err := db.Query(query, email)
 		if err != nil {
 			http.Error(w, "Error retrieving user preferences", http.StatusInternalServerError)
 			log.Printf("Error retrieving user preferences: %v", err)
@@ -226,7 +219,7 @@ func getUserPreferences(db *sql.DB) http.HandlerFunc {
 		var preferences []UserPreferences
 		for rows.Next() {
 			var preference UserPreferences
-			if err := rows.Scan(&preference.ID, &preference.StartTime, &preference.EndTime, &preference.MinMag, &preference.MaxMag, &preference.MinDepth, &preference.MaxDepth); err != nil {
+			if err := rows.Scan(&preference.StartTime, &preference.EndTime, &preference.MinMag, &preference.MaxMag, &preference.MinDepth, &preference.MaxDepth); err != nil {
 				http.Error(w, "Error reading user preferences", http.StatusInternalServerError)
 				log.Printf("Error reading user preferences: %v", err)
 				return
@@ -245,7 +238,6 @@ func getUserPreferences(db *sql.DB) http.HandlerFunc {
 
 // function to get earthquake count
 func getEarthquakeCount(db *sql.DB) http.HandlerFunc {
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Extract query parameters
 		startTime := r.URL.Query().Get("startTime")

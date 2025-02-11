@@ -138,60 +138,61 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
    return (
       <div className="bg-gray-800 bg-opacity-80 z-50 p-4 rounded-lg shadow-lg">
          {/* Note about shift click */}
-         <div className="mt-4">
-            <p className="text-black text-sm italic">SHIFT + Click to select area</p>
+         <div className="mt-2">
+            <p className="text-gray-300 text-sm italic">SHIFT + Click to select area</p>
          </div>
+
          {/* Start Time */}
          <div className="mb-4">
-            <label className="block text-sm font-medium text-white-700">Start Time</label>
-            <input type="date" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="bg-gray-800 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-white">Start Time</label>
+            <input type="date" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="bg-gray-800 text-white block w-full px-3 py-2 border border-gray-600 rounded-md" />
          </div>
 
          {/* End Time */}
          <div className="mb-4">
-            <label className="block text-sm font-medium text-white-700">End Time</label>
-            <input type="date" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="bg-gray-800 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-white">End Time</label>
+            <input type="date" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="bg-gray-800 text-white block w-full px-3 py-2 border border-gray-600 rounded-md" />
          </div>
 
          {/* Min Magnitude */}
          <div className="mb-4">
-            <label className="block text-sm font-medium text-white-700">Min Magnitude</label>
-            <input type="number" value={minMagnitude} onChange={(e) => setMinMagnitude(Number(e.target.value))} className="bg-gray-800 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-white">Min Magnitude</label>
+            <input type="number" value={minMagnitude} onChange={(e) => setMinMagnitude(Number(e.target.value))} className="bg-gray-800 text-white block w-full px-3 py-2 border border-gray-600 rounded-md" />
          </div>
 
          {/* Max Magnitude */}
          <div className="mb-4">
-            <label className="block text-sm font-medium text-white-700">Max Magnitude</label>
-            <input type="number" value={maxMagnitude} onChange={(e) => setMaxMagnitude(Number(e.target.value))} className=" bg-gray-800 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-white">Max Magnitude</label>
+            <input type="number" value={maxMagnitude} onChange={(e) => setMaxMagnitude(Number(e.target.value))} className="bg-gray-800 text-white block w-full px-3 py-2 border border-gray-600 rounded-md" />
          </div>
 
          {/* Min Depth */}
          <div className="mb-4">
-            <label className="block text-sm font-medium text-white-700">Min Depth</label>
-            <input type="number" value={minDepth} onChange={(e) => setMinDepth(Number(e.target.value))} className="bg-gray-800 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-white">Min Depth</label>
+            <input type="number" value={minDepth} onChange={(e) => setMinDepth(Number(e.target.value))} className="bg-gray-800 text-white block w-full px-3 py-2 border border-gray-600 rounded-md" />
          </div>
 
          {/* Max Depth */}
          <div className="mb-4">
-            <label className="block text-sm font-medium text-white-700">Max Depth</label>
-            <input type="number" value={maxDepth} onChange={(e) => setMaxDepth(Number(e.target.value))} className="bg-gray-800 block w-full px-3 py-2 border border-gray-300 rounded-md" />
+            <label className="block text-sm font-medium text-white">Max Depth</label>
+            <input type="number" value={maxDepth} onChange={(e) => setMaxDepth(Number(e.target.value))} className="bg-gray-800 text-white block w-full px-3 py-2 border border-gray-600 rounded-md" />
          </div>
-         {/* Update Earthquakes Button */}
-         <button onClick={fetchEarthquakeCount} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+
+         {/* Buttons */}
+         <button onClick={fetchEarthquakeCount} className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
             Update Earthquakes
          </button>
 
-         {/* Save Preferences Button */}
-         <button onClick={handleSavePreferences} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mt-2">
+         <button onClick={handleSavePreferences} className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mt-2 transition">
             Save Preferences
          </button>
 
-         {/* Display Total Earthquakes */}
+         {/* Total Earthquakes */}
          <div className="mt-4">
             <h1 className="text-white">Total Earthquakes: {numEarthquakes}</h1>
          </div>
 
-         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onContinue={handleContinueAnyways} count={modalCount}></Modal>
+         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onContinue={handleContinueAnyways} count={modalCount} />
       </div>
    );
 };

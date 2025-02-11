@@ -83,8 +83,8 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
   const fetchEarthquakeCount = async () => {
    https://earthquake-globe-web-0wajea.fly.dev/
     const response = await axios.get(
-      //"http://localhost:8080/api/go/earthquakes/count",
-      "https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes/count",
+      "http://localhost:8080/api/go/earthquakes/count",
+      //"https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes/count",
       {
         params: {
           startTime,
@@ -111,8 +111,8 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
   const fetchEarthquakeJSON = async () => {
     try {
       const response = await axios.get(
-        "https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes",
-        //"http://localhost:8080/api/go/earthquakes",
+        //"https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes",
+        "http://localhost:8080/api/go/earthquakes",
         {
           params: {
             startTime,

@@ -55,7 +55,7 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
    //const fetch earthquake count
    // const fetchEarthquakeCount = async () => {
    //    const response = await axios.get("http://localhost:8080/api/go/earthquakes/count");
-   // }  
+   // }
 
    // Method to query backend API for earthquake data
    const fetchEarthquakeJSON = async () => {
@@ -131,7 +131,11 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
             <input type="number" id="maxDepth" value={maxDepth} onChange={(e) => setMaxDepth(Number(e.target.value))} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md" />
          </div>
 
-         <button onClick={fetchEarthquakeJSON} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+         <div className="mb-4">
+            <p className="text-black text-sm italic">SHIFT + Click to select area</p>
+         </div>
+
+         <button onClick={fetchEarthquakeJSON} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mb-2">
             Update Earthquakes
          </button>
 

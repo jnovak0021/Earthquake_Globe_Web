@@ -64,7 +64,7 @@ const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onE
 
          {isDropdownOpen && (
             <div className="absolute top-20 right-12 w-80 bg-gray-800 bg-opacity-80 p-2 rounded-lg shadow-lg max-h-[700px] overflow-y-auto">
-               <h1 className="text-xl font-bold text-white mb-4">Earthquake Filter</h1>
+               <h1 className="text-xl font-bold text-gray-600 mb-4">Earthquake Filter</h1>
                <EarthquakeFilter onEarthquakesUpdate={onEarthquakesUpdate} saveUserPreferences={saveUserPreferences} userEmail={userEmail} savedPreferences={userPreferences} updateUserPreferences={setUserPreferences} />
             </div>
          )}

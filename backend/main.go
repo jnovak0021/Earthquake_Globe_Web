@@ -33,7 +33,7 @@ type Earthquake struct {
 }
 
 type UserPreferences struct {
-	Email     string   `json:"email"`    // Link to the user (foreign key)
+	Email     string  `json:"email"`      // Link to the user (foreign key)
 	StartTime string  `json:"start_time"` // Start time for the preference filter
 	EndTime   string  `json:"end_time"`   // End time for the preference filter
 	MinMag    float64 `json:"min_mag"`    // Minimum magnitude for filter
@@ -88,17 +88,18 @@ func main() {
 	// User routes
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")                            // Get all users
-	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")                         // Create a new user (signup)
-	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")                          // User login
-	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")                        // Get user by ID
-	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")                     // Update user
-	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE")                  // Delete user
-	router.HandleFunc("/api/go/users/preferences", createUserPreferences(db)).Methods("POST")  // Create user preferences
+	router.HandleFunc("/api/go/users", getUsers(db)).Methods("GET")                               // Get all users
+	router.HandleFunc("/api/go/users", createUser(db)).Methods("POST")                            // Create a new user (signup)
+	router.HandleFunc("/api/go/login", loginUser(db)).Methods("POST")                             // User login
+	router.HandleFunc("/api/go/users/{id}", getUser(db)).Methods("GET")                           // Get user by ID
+	router.HandleFunc("/api/go/users/{id}", updateUser(db)).Methods("PUT")                        // Update user
+	router.HandleFunc("/api/go/users/{id}", deleteUser(db)).Methods("DELETE")                     // Delete user
+	router.HandleFunc("/api/go/users/preferences", createUserPreferences(db)).Methods("POST")     // Create user preferences
 	router.HandleFunc("/api/go/users/preferences/{email}", getUserPreferences(db)).Methods("GET") // Get user preferences
 
 	// add router to retrieve the counts of earthquakes
-	//router.HandleFunc("/api/go/earthquakes/count", getEarthquakeCount(db)).Methods("GET")
+	router.HandleFunc("/api/go/earthquakes/count", getEarthquakeCount(db)).Methods("GET")
+
 	//add router decleration for quering earthquake data
 	router.HandleFunc("/api/go/earthquakes", getEarthquakes(db)).Methods("GET") // Get all earthquakes
 
@@ -155,7 +156,6 @@ func createUserPreferences(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Saving user preferences")
 
-
 		var preferences UserPreferences
 		err := json.NewDecoder(r.Body).Decode(&preferences)
 		if err != nil {
@@ -166,7 +166,6 @@ func createUserPreferences(db *sql.DB) http.HandlerFunc {
 		// Log the decoded preferences
 		log.Printf("Received preferences: email=%s, start_time=%s, end_time=%s, min_mag=%f, max_mag=%f, min_depth=%f, max_depth=%f",
 			preferences.Email, preferences.StartTime, preferences.EndTime, preferences.MinMag, preferences.MaxMag, preferences.MinDepth, preferences.MaxDepth)
-
 
 		// Query to insert or update user preferences
 		query := `
@@ -192,7 +191,6 @@ func createUserPreferences(db *sql.DB) http.HandlerFunc {
 		w.Write([]byte("Preferences saved successfully"))
 	}
 }
-
 
 func getUserPreferences(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -238,11 +236,52 @@ func getUserPreferences(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// function to get earthquake count
+func getEarthquakeCount(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Extract query parameters
+		startTime := r.URL.Query().Get("startTime")
+		endTime := r.URL.Query().Get("endTime")
+		minMagnitude := r.URL.Query().Get("minMagnitude")
+		maxMagnitude := r.URL.Query().Get("maxMagnitude")
+		minDepth := r.URL.Query().Get("minDepth")
+		maxDepth := r.URL.Query().Get("maxDepth")
 
-// // function to get earthquake count
-// func getEarthquakeCount(db *sql.DB) http.HandlerFunc {
+		//var count int
+		query := `
+					SELECT COUNT(id) AS count
+					FROM Earthquakes
+					WHERE time BETWEEN ? AND ?
+					AND mag BETWEEN ? AND ?
+					AND depth BETWEEN ? AND ?
+				`
+		var count int
+		rows, err := db.Query(query, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
 
-// }
+		if rows.Next() {
+			if err := rows.Scan(&count); err != nil {
+				log.Fatal(err)
+			}
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		response := map[string]int{"count": count}
+
+		// Set the response header to JSON and write the response
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Failed to encode response as JSON", http.StatusInternalServerError)
+		}
+
+	}
+}
 
 ///api/go/earthquakes&startTime=2020-01-01&endTime=2025-01-01&minMagnitude=0&maxMagnitude=10&minDepth=-100&maxDepth=1000
 
@@ -268,6 +307,8 @@ func getEarthquakes(db *sql.DB) http.HandlerFunc {
             AND mag BETWEEN ? AND ?
             AND depth BETWEEN ? AND ?
         `
+
+		//var count int
 		rows, err := db.Query(query, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)
 		if err != nil {
 			log.Fatal(err)

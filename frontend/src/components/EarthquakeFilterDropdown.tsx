@@ -42,7 +42,9 @@ const EarthquakeFilterDropdown: React.FC<EarthquakeFilterDropdownProps> = ({ onE
       }
 
       try {
-         const response = await axios.get(`http://localhost:8080/api/go/users/preferences/${userEmail}`);
+         
+         const response = await axios.get(`https://earthquake-globe-web-0wajea.fly.dev/api/go/users/preferences/${userEmail}`);
+         //const response = await axios.get(`http://localhost:8080/api/go/users/preferences/${userEmail}`);
          if (response.data.length > 0) {
             setUserPreferences(response.data[0]);
             localStorage.setItem(`preferences_${userEmail}`, JSON.stringify(response.data[0]));

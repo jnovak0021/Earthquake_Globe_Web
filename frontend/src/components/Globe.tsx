@@ -15,6 +15,7 @@ interface Earthquake {
 
 interface GlobeProps {
    earthquakes: Earthquake[];
+   
 }
 
 const Globe: React.FC<GlobeProps> = ({ earthquakes }) => {

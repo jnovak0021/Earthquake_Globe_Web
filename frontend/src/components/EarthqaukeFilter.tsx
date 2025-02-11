@@ -68,6 +68,10 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [continueAnyways, setContinueAnyways] = useState(false);
   const [modalCount, setModalCount] = useState(0);
+//   const [minLatitude, setMinLatitude] = useState(-90);
+//   const [minLongitude, setMinLongitude] = useState(-180);
+//   const [maxLatitude, setMaxLatitude] = useState(90);
+//   const [maxLongitude, setMaxLongitude] = useState(180);
 
   useEffect(() => {
     if (savedPreferences) {
@@ -80,8 +84,17 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
     }
   }, [savedPreferences]);
 
+//   //function for getting data fromt he globe
+//   const handleSelectionComplete = (minLat: number, minLng: number, maxLat: number, maxLng: number) => {
+//    setMinLatitude(minLat);
+//    setMinLongitude(minLng);
+//    setMaxLatitude(maxLat);
+//    setMaxLongitude(maxLng);
+//    console.log("Selected Bounds in EarthquakeFilter:", { minLat, minLng, maxLat, maxLng });
+//    // You can now use the selected bounds to filter earthquakes or perform other actions
+//  };
+
   const fetchEarthquakeCount = async () => {
-   https://earthquake-globe-web-0wajea.fly.dev/
     const response = await axios.get(
       "http://localhost:8080/api/go/earthquakes/count",
       //"https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes/count",
@@ -121,6 +134,8 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
             maxMagnitude,
             minDepth,
             maxDepth,
+            // minLongitude,
+            // minLatitude,
           },
         }
       );

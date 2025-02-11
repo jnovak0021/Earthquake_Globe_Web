@@ -79,10 +79,12 @@ const Globe: React.FC<GlobeProps> = ({ earthquakes }) => {
             el.style.border = "2px solid white";
 
             const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(
-               `<strong>${place}</strong><br>
-          Magnitude: ${mag}<br>
-          Depth: ${depth.toFixed(2)} km`
-            );
+               `<div style="background: rgba(50, 50, 50, 0.7); padding: 8px; border-radius: 5px;">
+                  <strong style="color: white;">${place}</strong><br>
+                  <span style="color: white;">Magnitude: ${mag}</span><br>
+                  <span style="color: white;">Depth: ${depth.toFixed(2)} km</span>
+                </div>`
+             );
 
             if (mapRef.current) {
                new mapboxgl.Marker(el).setLngLat([longitude, latitude]).setPopup(popup).addTo(mapRef.current);

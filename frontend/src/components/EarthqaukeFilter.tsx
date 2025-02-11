@@ -52,13 +52,18 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({ onEarthquakesUpdate
    //    }));
    // };
 
+   //const fetch earthquake count
+   // const fetchEarthquakeCount = async () => {
+   //    const response = await axios.get("http://localhost:8080/api/go/earthquakes/count");
+   // }  
+
    // Method to query backend API for earthquake data
    const fetchEarthquakeJSON = async () => {
       console.log("Fetching Earthquake JSON from backend");
 
       try {
-         const response = await axios.get("https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes", {
-         //const response = await axios.get("http://localhost:8080/api/go/earthquakes", {
+         //const response = await axios.get("https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes", {
+         const response = await axios.get("http://localhost:8080/api/go/earthquakes", {
             params: {
                //userId, // Send userId in the request if needed
                startTime,

@@ -98,6 +98,8 @@ func main() {
 	router.HandleFunc("/api/go/users/preferences", createUserPreferences(db)).Methods("POST")  // Create user preferences
 	router.HandleFunc("/api/go/users/preferences/{id}", getUserPreferences(db)).Methods("GET") // Get user preferences
 
+	// add router to retrieve the counts of earthquakes
+	//router.HandleFunc("/api/go/earthquakes/count", getEarthquakeCount(db)).Methods("GET")
 	//add router decleration for quering earthquake data
 	router.HandleFunc("/api/go/earthquakes", getEarthquakes(db)).Methods("GET") // Get all earthquakes
 
@@ -240,6 +242,11 @@ func getUserPreferences(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// // function to get earthquake count
+// func getEarthquakeCount(db *sql.DB) http.HandlerFunc {
+
+// }
+
 ///api/go/earthquakes&startTime=2020-01-01&endTime=2025-01-01&minMagnitude=0&maxMagnitude=10&minDepth=-100&maxDepth=1000
 
 // function to get earthquakes from aws
@@ -256,7 +263,7 @@ func getEarthquakes(db *sql.DB) http.HandlerFunc {
 		minDepth := r.URL.Query().Get("minDepth")
 		maxDepth := r.URL.Query().Get("maxDepth")
 
-		// Build the SQL query with the parameters
+		//var count int
 		query := `
             SELECT id, time, latitude, longitude, depth, mag, place, status
             FROM Earthquakes

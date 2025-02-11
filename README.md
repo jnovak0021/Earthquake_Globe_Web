@@ -36,6 +36,7 @@ This will containerize the full stack and will allow you to run the program.
 
 ### Note for Dev
 If you are just working on front end, you can just run npm dev to get automatic feedback and updates
+npm install --save-dev @types/react
 
 
 Currently hosted using AWS, Vercel, and Fly.io

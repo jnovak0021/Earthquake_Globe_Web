@@ -99,7 +99,8 @@ func main() {
 	router.HandleFunc("/api/go/users/preferences/{id}", getUserPreferences(db)).Methods("GET") // Get user preferences
 
 	// add router to retrieve the counts of earthquakes
-	//router.HandleFunc("/api/go/earthquakes/count", getEarthquakeCount(db)).Methods("GET")
+	router.HandleFunc("/api/go/earthquakes/count", getEarthquakeCount(db)).Methods("GET")
+
 	//add router decleration for quering earthquake data
 	router.HandleFunc("/api/go/earthquakes", getEarthquakes(db)).Methods("GET") // Get all earthquakes
 
@@ -242,10 +243,53 @@ func getUserPreferences(db *sql.DB) http.HandlerFunc {
 	}
 }
 
-// // function to get earthquake count
-// func getEarthquakeCount(db *sql.DB) http.HandlerFunc {
+// function to get earthquake count
+func getEarthquakeCount(db *sql.DB) http.HandlerFunc {
 
-// }
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Extract query parameters
+		startTime := r.URL.Query().Get("startTime")
+		endTime := r.URL.Query().Get("endTime")
+		minMagnitude := r.URL.Query().Get("minMagnitude")
+		maxMagnitude := r.URL.Query().Get("maxMagnitude")
+		minDepth := r.URL.Query().Get("minDepth")
+		maxDepth := r.URL.Query().Get("maxDepth")
+
+		//var count int
+		query := `
+					SELECT COUNT(id) AS count
+					FROM Earthquakes
+					WHERE time BETWEEN ? AND ?
+					AND mag BETWEEN ? AND ?
+					AND depth BETWEEN ? AND ?
+				`
+		var count int
+		rows, err := db.Query(query, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		if rows.Next() {
+			if err := rows.Scan(&count); err != nil {
+				log.Fatal(err)
+			}
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		response := map[string]int{"count": count}
+
+		// Set the response header to JSON and write the response
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Failed to encode response as JSON", http.StatusInternalServerError)
+		}
+
+	}
+}
 
 ///api/go/earthquakes&startTime=2020-01-01&endTime=2025-01-01&minMagnitude=0&maxMagnitude=10&minDepth=-100&maxDepth=1000
 
@@ -271,6 +315,8 @@ func getEarthquakes(db *sql.DB) http.HandlerFunc {
             AND mag BETWEEN ? AND ?
             AND depth BETWEEN ? AND ?
         `
+
+		//var count int
 		rows, err := db.Query(query, startTime, endTime, minMagnitude, maxMagnitude, minDepth, maxDepth)
 		if err != nil {
 			log.Fatal(err)

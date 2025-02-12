@@ -13,8 +13,8 @@ export default function Login({ setIsLoggedIn, setUser }: { setIsLoggedIn: React
       console.log("Login attempt with email:", email); // Debugging
 
       try {
-         //const response = await fetch("https://earthquake-globe-web-0wajea.fly.dev/api/go/login", {
-         const response = await fetch("http://localhost:8080/api/go/login", {
+         const response = await fetch("https://earthquake-globe-web-0wajea.fly.dev/api/go/login", {
+         //const response = await fetch("http://localhost:8080/api/go/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password }),

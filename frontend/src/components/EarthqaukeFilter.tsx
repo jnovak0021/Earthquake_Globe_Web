@@ -68,10 +68,7 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [continueAnyways, setContinueAnyways] = useState(false);
   const [modalCount, setModalCount] = useState(0);
-//   const [minLatitude, setMinLatitude] = useState(-90);
-//   const [minLongitude, setMinLongitude] = useState(-180);
-//   const [maxLatitude, setMaxLatitude] = useState(90);
-//   const [maxLongitude, setMaxLongitude] = useState(180);
+
 
   useEffect(() => {
     if (savedPreferences) {
@@ -97,7 +94,8 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
   const fetchEarthquakeCount = async () => {
     const response = await axios.get(
       //"http://localhost:8080/api/go/earthquakes/count",
-      "https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes/count",
+      //"https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes/count",
+      "https://earthquake-globe-web-tqt5rw.fly.dev/api/go/earthquakes/count",
       {
         params: {
           startTime,
@@ -124,8 +122,10 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
   const fetchEarthquakeJSON = async () => {
     try {
       const response = await axios.get(
-        "https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes",
+        
+        //"https://earthquake-globe-web-0wajea.fly.dev/api/go/earthquakes",
         //"http://localhost:8080/api/go/earthquakes",
+        "https://earthquake-globe-web-tqt5rw.fly.dev/api/go/earthquakes",
         {
           params: {
             startTime,
@@ -134,8 +134,6 @@ const EarthquakeFilter: React.FC<EarthquakeFilterProps> = ({
             maxMagnitude,
             minDepth,
             maxDepth,
-            // minLongitude,
-            // minLatitude,
           },
         }
       );

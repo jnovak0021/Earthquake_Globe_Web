@@ -1,17 +1,12 @@
-# fly.toml app configuration file generated for earthquake-globe-web-0wajea on 2025-02-10T18:16:52Z
+# fly.toml app configuration file generated for earthquake-globe-web-tqt5rw on 2025-02-12T01:59:18Z
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'earthquake-globe-web-0wajea'
+app = 'earthquake-globe-web-tqt5rw'
 primary_region = 'lax'
 
 [build]
-  [build.args]
-    GO_VERSION = '1.20'
-
-[env]
-  PORT = '8080'
 
 [http_service]
   internal_port = 8080

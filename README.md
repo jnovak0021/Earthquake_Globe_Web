@@ -1,4 +1,4 @@
-# Earquake Globe Web Application project
+# Earthquake  Globe Web Application project
 ## By Jacob Novak, Adam Holbel, and Danny Mendoza
 
 ## About

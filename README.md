@@ -1,4 +1,4 @@
-# Earquake Globe Web Application project
+# Earthquake  Globe Web Application project
 ## By Jacob Novak, Adam Holbel, and Danny Mendoza
 
 ## About
@@ -6,6 +6,13 @@
 This project was developed using docker to containerize a mysql database, a goland backend, and a nextjs frontend.
 
 The goal of creating this full stack web-application was to allow users to view earthquake data across the globe by interacting with a globe.
+### Photos of Project
+![Screenshot 2025-03-11 131203](https://github.com/user-attachments/assets/b6d8b648-d65c-4ef2-a3ca-477e88e26878)
+![Screenshot 2025-03-11 131327](https://github.com/user-attachments/assets/ec9b8ed7-c980-4a4c-92f5-69a9e7bd1b43)
+![Screenshot 2025-03-11 131352](https://github.com/user-attachments/assets/a750298f-24b2-4a31-8920-879f917435b7)
+![Screenshot 2025-03-11 131424](https://github.com/user-attachments/assets/31b0273e-396c-46e9-9ad9-c4d5bb4e3240)
+![Screenshot 2025-03-11 131441](https://github.com/user-attachments/assets/f20a1731-5897-4acd-a6d2-aac3069540f3)
+
 
 ### Installation
 ----

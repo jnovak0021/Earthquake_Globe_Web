@@ -76,12 +76,12 @@ def queryAPI(year, month):
     return totalData
 
 # Query the API and save the data
-year = 2020
+year = 2000
 month = 1
 all_data = queryAPI(year, month)
 
 # Save the collected data into a CSV file
-csv_file_path = "earthquake_data_2020_2025.csv"
+csv_file_path = "earthquake_data_Last_100.csv"
 with open(csv_file_path, "w", newline='',encoding='utf-8') as csv_file:
     fieldnames = [
         'id', 'time', 'latitude', 'longitude', 'depth', 'mag', 'place', 'status'
@@ -91,4 +91,4 @@ with open(csv_file_path, "w", newline='',encoding='utf-8') as csv_file:
     for data in all_data:
         writer.writerow(data)
 
-print("Data saved to earthquake_data_2020_2025.csv")
+print("Data saved to earthquake2000.csv")
